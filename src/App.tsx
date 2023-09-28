@@ -1,6 +1,6 @@
 import './App.css'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -10,8 +10,19 @@ import Tabs from '@mui/material/Tabs';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
+import Yaml from './tabs/Yaml';
+import { DevfileContent } from './model/devfileContent';
+
 function App() {
 
+  // DEVFILE STATE
+  const [devfile, setDevfile] = useState({} as DevfileContent)
+
+  useEffect(() => {
+    // TODO get devfile from API
+  }, []);
+
+  // TABS
   const tabNames: string[] = [
     "YAML",
     "Chart",
@@ -24,11 +35,18 @@ function App() {
     "Volumes"
   ];
 
-  const [value, setValue] = useState(0);
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const [tabValue, setTabValue] = useState(0);
+  const handleChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
+
+  const onYamlChange = (content: string) => {
+    setDevfile({...devfile, content: content});
+  }
+
+  const onYamlClear = () => {
+    setDevfile({...devfile, content: ""});
+  }
 
   return (
     <>
@@ -42,34 +60,38 @@ function App() {
           </Toolbar>
         </AppBar>
         <main>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-            {tabNames.map(tabName => ( <Tab label={tabName} /> ))}
+          <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
+            {tabNames.map(tabName => ( <Tab key={tabName} label={tabName} /> ))}
           </Tabs>
-          <CustomTabPanel value={value} index={0}>
-            Item One
+          <CustomTabPanel key="content-0" value={tabValue} index={0}>
+            <Yaml 
+              content={ devfile.content }
+              onChange={ onYamlChange }
+              onClear={ onYamlClear }
+            />
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={1}>
+          <CustomTabPanel key="content-1" value={tabValue} index={1}>
             Item Two
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={2}>
+          <CustomTabPanel key="content-2" value={tabValue} index={2}>
             Item Three
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={3}>
+          <CustomTabPanel key="content-3" value={tabValue} index={3}>
             Item 4
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={4}>
+          <CustomTabPanel key="content-4" value={tabValue} index={4}>
             Item 5
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={5}>
+          <CustomTabPanel key="content-5" value={tabValue} index={5}>
             Item 6
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={6}>
+          <CustomTabPanel key="content-6" value={tabValue} index={6}>
             Item 7
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={7}>
+          <CustomTabPanel key="content-7" value={tabValue} index={7}>
             Item 8
           </CustomTabPanel>
-          <CustomTabPanel value={value} index={8}>
+          <CustomTabPanel key="content-8" value={tabValue} index={8}>
             Item 9
           </CustomTabPanel>
         </main>
@@ -97,7 +119,7 @@ function CustomTabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          <Typography component="div">{children}</Typography>
         </Box>
       )}
     </div>
