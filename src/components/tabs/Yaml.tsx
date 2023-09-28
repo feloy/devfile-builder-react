@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,26 +13,25 @@ interface props {
 
 function Yaml(props: props) {
 
-    const [value, setValue] = useState(props.content)
+    const [content, setContent] = useState(props.content)
 
     const onApply = () => {
-        props.onChange(value);
+        props.onChange(content);
     }
     const onClear = () => {
-        setValue('');
-        props.onClear();        
+        props.onClear();
     }
 
     return <>
         <Box width="100%">
             <TextField
-                id="devfile-yaml"
                 label="Devfile YAML"
                 multiline
                 fullWidth
                 minRows="20" maxRows="20"
-                value={value}
-                onChange={(e) => { setValue(e.target.value); }}
+                defaultValue={props.content}
+                value={content}
+                onChange={(e) => { setContent(e.target.value); }}
             />
         </Box>
         <Stack spacing={2} direction="row" margin="16px 0">

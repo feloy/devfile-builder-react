@@ -10,16 +10,23 @@ import Tabs from '@mui/material/Tabs';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
-import Yaml from './tabs/Yaml';
+import Yaml from './components/tabs/Yaml';
 import { DevfileContent } from './model/devfileContent';
+import { setDevfileContent } from './services/devstate';
+import { getDevfile as getDevfileFromApi } from './services/api';
 
 function App() {
 
   // DEVFILE STATE
   const [devfile, setDevfile] = useState({} as DevfileContent)
 
+  // Load devfile from API at startup, then set it into devstate
   useEffect(() => {
-    // TODO get devfile from API
+    getDevfileFromApi().then((c) => {
+      setDevfileContent(c.data.content || '').then((d) => {
+        setDevfile(d.data);
+      });
+    });
   }, []);
 
   // TABS
@@ -71,28 +78,28 @@ function App() {
             />
           </CustomTabPanel>
           <CustomTabPanel key="content-1" value={tabValue} index={1}>
-            Item Two
+            Chart
           </CustomTabPanel>
           <CustomTabPanel key="content-2" value={tabValue} index={2}>
-            Item Three
+            <pre>{JSON.stringify(devfile.metadata, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
-            Item 4
+            <pre>{JSON.stringify(devfile.commands, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-4" value={tabValue} index={4}>
-            Item 5
+            <pre>{JSON.stringify(devfile.events, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-5" value={tabValue} index={5}>
-            Item 6
+            <pre>{JSON.stringify(devfile.containers, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-6" value={tabValue} index={6}>
-            Item 7
+            <pre>{JSON.stringify(devfile.images, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-7" value={tabValue} index={7}>
-            Item 8
+            <pre>{JSON.stringify(devfile.resources, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-8" value={tabValue} index={8}>
-            Item 9
+            <pre>{JSON.stringify(devfile.volumes, null, 2)}</pre>
           </CustomTabPanel>
         </main>
       </Box>
