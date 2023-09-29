@@ -90,7 +90,7 @@ return <>
                     />
             </Grid>
             <Grid item xs={1}>
-                {/* TODO(feloy): display icon */}
+                <img width="56" src={metadata.icon} />
             </Grid>
             <Grid item xs={5}>
                 <TextField
