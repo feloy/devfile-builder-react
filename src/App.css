@@ -1,5 +1,5 @@
 main { 
-  display: bock;
+  display: block;
   min-height: calc(100vh - 100px);
   padding: 16px;
   background-color: #fff;

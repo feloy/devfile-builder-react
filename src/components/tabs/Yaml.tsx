@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 
 interface props {
     content: string;
-    onChange: (value: string) => void
+    onApply: (value: string) => void
     onClear: () => void
 }
 
@@ -16,7 +16,7 @@ function Yaml(props: props) {
     const [content, setContent] = useState(props.content)
 
     const onApply = () => {
-        props.onChange(content);
+        props.onApply(content);
     }
     const onClear = () => {
         props.onClear();
@@ -29,7 +29,7 @@ function Yaml(props: props) {
                 multiline
                 fullWidth
                 minRows="20" maxRows="20"
-                defaultValue={props.content}
+                defaultValue={props.content} /* It should not be necessary for a controlled component (feloy) */
                 value={content}
                 onChange={(e) => { setContent(e.target.value); }}
             />

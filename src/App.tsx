@@ -59,7 +59,7 @@ function App() {
    * 
    * @param content Devfile YAML content
    */
-  const onYamlChange = (content: string) => {
+  const onYamlApply = (content: string) => {
     sendDevfileContentToDevstate(content);
   }
 
@@ -105,7 +105,7 @@ function App() {
           <CustomTabPanel key="content-0" value={tabValue} index={0}>
             <Yaml 
               content={ devfile.content }
-              onChange={ onYamlChange }
+              onApply={ onYamlApply }
               onClear={ onYamlClear }
             />
           </CustomTabPanel>
