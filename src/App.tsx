@@ -14,18 +14,25 @@ import Yaml from './components/tabs/Yaml';
 import { DevfileContent } from './model/devfileContent';
 import { setDevfileContent } from './services/devstate';
 import { getDevfile as getDevfileFromApi } from './services/api';
+import { AxiosError } from 'axios';
 
 function App() {
 
   // DEVFILE STATE
   const [devfile, setDevfile] = useState({} as DevfileContent)
 
-  // Load devfile from API at startup, then set it into devstate
+  /**
+   *  Load devfile from API at startup, then set it into devstate
+   */
   useEffect(() => {
     getDevfileFromApi().then((c) => {
       setDevfileContent(c.data.content || '').then((d) => {
         setDevfile(d.data);
+      }).catch((error: AxiosError) => {
+        alert(error.message);
       });
+    }).catch((error: AxiosError) => {
+      alert(error.message);
     });
   }, []);
 
@@ -47,12 +54,37 @@ function App() {
     setTabValue(newValue);
   };
 
+  /**
+   * Called when the content of the YAML textarea is applied
+   * 
+   * @param content Devfile YAML content
+   */
   const onYamlChange = (content: string) => {
-    setDevfile({...devfile, content: content});
+    sendDevfileContentToDevstate(content);
   }
 
+  /**
+   * Called when the Clear button of the YAML textarea is clicked
+   */
   const onYamlClear = () => {
-    setDevfile({...devfile, content: ""});
+    const newContent = "schemaVersion: 2.2.0";
+    sendDevfileContentToDevstate(newContent);
+  }
+
+  // UTILITY FUNCTIONS
+
+  /**
+   * Send the new Devfile content to the Devstate, and sets
+   * the new received Devfile state in the local state
+   *
+   * @param (string) content Devfile content
+   */
+  function sendDevfileContentToDevstate(content: string) {
+    setDevfileContent(content).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      alert(error.message);
+    });  
   }
 
   return (
