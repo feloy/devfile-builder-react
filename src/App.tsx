@@ -1,5 +1,6 @@
 import './App.css'
 
+import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 
 import AppBar from '@mui/material/AppBar';
@@ -11,10 +12,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
 import Yaml from './components/tabs/Yaml';
+import MetadataForm from './components/tabs/MetadataForm';
+
 import { DevfileContent } from './model/devfileContent';
-import { setDevfileContent } from './services/devstate';
+import { Metadata } from './model/metadata';
+
+import { setDevfileContent, setMetadata } from './services/devstate';
 import { getDevfile as getDevfileFromApi } from './services/api';
-import { AxiosError } from 'axios';
 
 function App() {
 
@@ -71,6 +75,17 @@ function App() {
     sendDevfileContentToDevstate(newContent);
   }
 
+  /**
+   * Called when the Apply button on the Metadata tab is clicked
+   */
+  const onMetadataApply = (metadata: Metadata) => {
+    setMetadata(metadata).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      alert(error.message);
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -102,6 +117,7 @@ function App() {
           <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
             {tabNames.map(tabName => ( <Tab key={tabName} label={tabName} /> ))}
           </Tabs>
+
           <CustomTabPanel key="content-0" value={tabValue} index={0}>
             <Yaml 
               content={ devfile.content }
@@ -109,12 +125,15 @@ function App() {
               onClear={ onYamlClear }
             />
           </CustomTabPanel>
+
           <CustomTabPanel key="content-1" value={tabValue} index={1}>
             Chart
           </CustomTabPanel>
+
           <CustomTabPanel key="content-2" value={tabValue} index={2}>
-            <pre>{JSON.stringify(devfile.metadata, null, 2)}</pre>
+            <MetadataForm metadata={devfile.metadata} onApply={ onMetadataApply } />
           </CustomTabPanel>
+
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
             <pre>{JSON.stringify(devfile.commands, null, 2)}</pre>
           </CustomTabPanel>
