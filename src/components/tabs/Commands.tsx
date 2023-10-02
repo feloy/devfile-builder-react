@@ -7,6 +7,11 @@ import { ExecCommand } from '../../model/execCommand';
 import { ApplyCommand } from '../../model/applyCommand';
 import { ImageCommand } from '../../model/imageCommand';
 import { CompositeCommand } from '../../model/compositeCommand';
+import AddCommand from '../fabs/AddCommand';
+import AddExecCommand from '../forms/AddExecCommand';
+import AddApplyCommand from '../forms/AddApplyCommand';
+import AddImageCommand from '../forms/AddImageCommand';
+import AddCompositeCommand from '../forms/AddCompositeCommand';
 
 
 function Commands({
@@ -39,7 +44,14 @@ function Commands({
             });
     }
     
-    return (
+    const [commandToDisplay, setCommandToDisplay] = useState('');
+
+    const handleAddCommand = (commandType: string) =>{
+        console.log("add command "+commandType);
+        setCommandToDisplay(commandType);
+    }
+
+    return <>
         <List>
             <ListSubheader>Build Commands</ListSubheader>
             { displayCommands('build') }                
@@ -54,7 +66,24 @@ function Commands({
             <ListSubheader>Generic Commands</ListSubheader>
             { displayCommands('') }
         </List>
-    )
+        <AddCommand onAddCommand={handleAddCommand}/>
+        <AddExecCommand 
+            display={commandToDisplay == 'exec'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddApplyCommand 
+            display={commandToDisplay == 'apply'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddImageCommand 
+            display={commandToDisplay == 'image'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddCompositeCommand 
+            display={commandToDisplay == 'composite'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+    </>
 }
 
 function CommandItem({
