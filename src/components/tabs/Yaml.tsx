@@ -5,22 +5,16 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-interface props {
+function Yaml({
+    content,
+    onApply,
+    onClear
+}: {
     content: string;
     onApply: (value: string) => void
     onClear: () => void
-}
-
-function Yaml(props: props) {
-
-    const [content, setContent] = useState(props.content)
-
-    const onApply = () => {
-        props.onApply(content);
-    }
-    const onClear = () => {
-        props.onClear();
-    }
+}) {
+    const [contentValue, setContentValue] = useState(content)
 
     return <>
         <Box width="100%">
@@ -29,13 +23,13 @@ function Yaml(props: props) {
                 multiline
                 fullWidth
                 minRows="20" maxRows="20"
-                defaultValue={props.content} /* It should not be necessary for a controlled component (feloy) */
-                value={content}
-                onChange={(e) => { setContent(e.target.value); }}
+                defaultValue={content} /* It should not be necessary for a controlled component (feloy) */
+                value={contentValue}
+                onChange={(e) => { setContentValue(e.target.value); }}
             />
         </Box>
         <Stack spacing={2} direction="row" margin="16px 0">
-            <Button onClick={onApply} variant="contained">Apply</Button>
+            <Button onClick={() => onApply(contentValue)} variant="contained">Apply</Button>
             <Button onClick={onClear} variant="text">Clear</Button>
         </Stack>
     </>

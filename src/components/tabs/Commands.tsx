@@ -8,16 +8,18 @@ import { ApplyCommand } from '../../model/applyCommand';
 import { ImageCommand } from '../../model/imageCommand';
 import { CompositeCommand } from '../../model/compositeCommand';
 
-interface props {
+
+function Commands({
+    commands, 
+    onDefaultChange, 
+    onDeleteCommand
+}: {
     commands: Command[];
     onDefaultChange: (name: string, group: string, checked: boolean) => void;
     onDeleteCommand: (name: string) => void;
-}
-
-function Commands(props: props) {
-    
+}) {
     const displayCommands = (group: string) => {
-        const list = props.commands
+        const list = commands
         .filter((command: Command) => command.group == group);
         if (list.length == 0) {
             return <ListItem><ListItemText>No {group} commands yet. You can create a command then drag&drop it here</ListItemText></ListItem>
@@ -29,8 +31,8 @@ function Commands(props: props) {
                         <ListItemText>
                             <CommandItem
                                 command={c}
-                                onDefaultChange={(ch) => props.onDefaultChange(c.name, c.group, ch)}
-                                onDeleteCommand={props.onDeleteCommand}/>
+                                onDefaultChange={(ch) => onDefaultChange(c.name, c.group, ch)}
+                                onDeleteCommand={onDeleteCommand}/>
                         </ListItemText>
                     </ListItem>
                 )
