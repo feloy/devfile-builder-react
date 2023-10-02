@@ -32,3 +32,13 @@ export const setMetadata = (metadata: Metadata): Promise<AxiosResponse<DevfileCo
       supportUrl: metadata.supportUrl,
     });
 };
+
+export const setDefaultCommand = (command: string, group: string): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.post<DevfileContent>(base+"/command/"+command+"/setDefault", {
+      group: group
+    });
+}
+
+export const unsetDefaultCommand = (command: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
+    return axios.post<DevfileContent>(base+"/command/"+command+"/unsetDefault", {});
+}

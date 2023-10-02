@@ -13,11 +13,12 @@ import Typography from '@mui/material/Typography';
 
 import Yaml from './components/tabs/Yaml';
 import MetadataForm from './components/tabs/MetadataForm';
+import Commands from './components/tabs/Commands';
 
 import { DevfileContent } from './model/devfileContent';
 import { Metadata } from './model/metadata';
 
-import { setDevfileContent, setMetadata } from './services/devstate';
+import { setDevfileContent, setMetadata, setDefaultCommand, unsetDefaultCommand } from './services/devstate';
 import { getDevfile as getDevfileFromApi } from './services/api';
 
 function App() {
@@ -86,6 +87,20 @@ function App() {
     });
   }
 
+  const onDefaultChange = (name: string, group: string, checked: boolean) => {
+    var cmd = undefined;
+    if (checked) {
+      cmd = setDefaultCommand;
+    } else {
+      cmd = unsetDefaultCommand;
+    }
+    cmd(name, group).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      alert(error.message);
+    });
+  };
+
   // UTILITY FUNCTIONS
 
   /**
@@ -135,8 +150,9 @@ function App() {
           </CustomTabPanel>
 
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
-            <pre>{JSON.stringify(devfile.commands, null, 2)}</pre>
+            <Commands commands={devfile.commands} onDefaultChange={onDefaultChange}/>
           </CustomTabPanel>
+
           <CustomTabPanel key="content-4" value={tabValue} index={4}>
             <pre>{JSON.stringify(devfile.events, null, 2)}</pre>
           </CustomTabPanel>
