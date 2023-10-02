@@ -42,3 +42,7 @@ export const setDefaultCommand = (command: string, group: string): Promise<Axios
 export const unsetDefaultCommand = (command: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
     return axios.post<DevfileContent>(base+"/command/"+command+"/unsetDefault", {});
 }
+
+export const deleteCommand = (command: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
+    return axios.delete<DevfileContent>(base+"/command/"+command);
+}

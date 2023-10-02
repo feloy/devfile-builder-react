@@ -18,8 +18,16 @@ import Commands from './components/tabs/Commands';
 import { DevfileContent } from './model/devfileContent';
 import { Metadata } from './model/metadata';
 
-import { setDevfileContent, setMetadata, setDefaultCommand, unsetDefaultCommand } from './services/devstate';
+import { 
+  setDevfileContent, 
+  setMetadata, 
+  setDefaultCommand, 
+  unsetDefaultCommand,
+  deleteCommand
+} from './services/devstate';
+
 import { getDevfile as getDevfileFromApi } from './services/api';
+import { GeneralError } from './model/generalError';
 
 function App() {
 
@@ -34,10 +42,10 @@ function App() {
       setDevfileContent(c.data.content || '').then((d) => {
         setDevfile(d.data);
       }).catch((error: AxiosError) => {
-        alert(error.message);
+        displayError(error);
       });
     }).catch((error: AxiosError) => {
-      alert(error.message);
+      displayError(error);
     });
   }, []);
 
@@ -83,10 +91,17 @@ function App() {
     setMetadata(metadata).then((d) => {
       setDevfile(d.data);
     }).catch((error: AxiosError) => {
-      alert(error.message);
+      displayError(error);
     });
   }
 
+  /**
+   * Called when a "Default <group> command" button on a Command has been clicked
+   * 
+   * @param name name of the command
+   * @param group group to which the command is affected
+   * @param checked is the command the default command of the group?
+   */
   const onDefaultChange = (name: string, group: string, checked: boolean) => {
     var cmd = undefined;
     if (checked) {
@@ -97,9 +112,25 @@ function App() {
     cmd(name, group).then((d) => {
       setDevfile(d.data);
     }).catch((error: AxiosError) => {
-      alert(error.message);
+      displayError(error);
     });
   };
+
+  /**
+   * Delete a command
+   * 
+   * @param name name of the command to delete
+   */
+  const onDeleteCommand = (name: string) => {
+    if(!confirm('You will delete the command "'+name+'". Continue?')) {
+      return;
+    }
+    deleteCommand(name).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      displayError(error);
+    });
+  }
 
   // UTILITY FUNCTIONS
 
@@ -113,8 +144,16 @@ function App() {
     setDevfileContent(content).then((d) => {
       setDevfile(d.data);
     }).catch((error: AxiosError) => {
-      alert(error.message);
+      displayError(error);
     });  
+  }
+
+  function displayError(error: AxiosError) {
+    if (error.response) {
+      alert((error.response.data as GeneralError).message);
+    } else {
+      alert(error.message);
+    }
   }
 
   return (
@@ -150,7 +189,11 @@ function App() {
           </CustomTabPanel>
 
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
-            <Commands commands={devfile.commands} onDefaultChange={onDefaultChange}/>
+            <Commands
+              commands={devfile.commands}
+              onDefaultChange={onDefaultChange}
+              onDeleteCommand={onDeleteCommand}
+            />
           </CustomTabPanel>
 
           <CustomTabPanel key="content-4" value={tabValue} index={4}>

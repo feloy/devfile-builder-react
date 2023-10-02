@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography } from '@mui/material';
+import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography, CardActions, Button } from '@mui/material';
 
 import { Command } from '../../model/command';
 import { ExecCommand } from '../../model/execCommand';
@@ -10,7 +10,8 @@ import { CompositeCommand } from '../../model/compositeCommand';
 
 interface props {
     commands: Command[];
-    onDefaultChange: (name: string, group: string, checked: boolean) => void
+    onDefaultChange: (name: string, group: string, checked: boolean) => void;
+    onDeleteCommand: (name: string) => void;
 }
 
 function Commands(props: props) {
@@ -26,7 +27,10 @@ function Commands(props: props) {
                 return (
                     <ListItem key={`command-${c.name}`}>
                         <ListItemText>
-                            <CommandItem command={c} onDefaultChange={(ch) => props.onDefaultChange(c.name, c.group, ch)}/>
+                            <CommandItem
+                                command={c}
+                                onDefaultChange={(ch) => props.onDefaultChange(c.name, c.group, ch)}
+                                onDeleteCommand={props.onDeleteCommand}/>
                         </ListItemText>
                     </ListItem>
                 )
@@ -51,7 +55,15 @@ function Commands(props: props) {
     )
 }
 
-function CommandItem({command, onDefaultChange}: {command: Command, onDefaultChange: (checked: boolean) => void}) {
+function CommandItem({
+    command, 
+    onDefaultChange,
+    onDeleteCommand
+}: {
+    command: Command, 
+    onDefaultChange: (checked: boolean) => void,
+    onDeleteCommand: (name: string) => void
+}) {
     return (
         <Card>
             <CommandHeader
@@ -67,6 +79,9 @@ function CommandItem({command, onDefaultChange}: {command: Command, onDefaultCha
                 { command.type == 'image' && <ImageCommandDetails command={command.image!} /> }
                 { command.type == 'composite' && <CompositeCommandDetails command={command.composite!} /> }
             </CardContent>
+            <CardActions>
+                <Button color="error" onClick={() => onDeleteCommand(command.name)}>Delete</Button>
+            </CardActions>
         </Card>
     )
 }
