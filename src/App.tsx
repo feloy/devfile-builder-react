@@ -52,7 +52,6 @@ function App() {
   // TABS
   const tabNames: string[] = [
     "YAML",
-    "Chart",
     "Metadata",
     "Commands",
     "Events",
@@ -181,14 +180,10 @@ function App() {
           </CustomTabPanel>
 
           <CustomTabPanel key="content-1" value={tabValue} index={1}>
-            Chart
-          </CustomTabPanel>
-
-          <CustomTabPanel key="content-2" value={tabValue} index={2}>
             <MetadataForm metadata={devfile.metadata} onApply={ onMetadataApply } />
           </CustomTabPanel>
 
-          <CustomTabPanel key="content-3" value={tabValue} index={3}>
+          <CustomTabPanel key="content-2" value={tabValue} index={2}>
             <Commands
               commands={devfile.commands}
               onDefaultChange={onDefaultChange}
@@ -196,19 +191,19 @@ function App() {
             />
           </CustomTabPanel>
 
-          <CustomTabPanel key="content-4" value={tabValue} index={4}>
+          <CustomTabPanel key="content-3" value={tabValue} index={3}>
             <pre>{JSON.stringify(devfile.events, null, 2)}</pre>
           </CustomTabPanel>
-          <CustomTabPanel key="content-5" value={tabValue} index={5}>
+          <CustomTabPanel key="content-4" value={tabValue} index={4}>
             <pre>{JSON.stringify(devfile.containers, null, 2)}</pre>
           </CustomTabPanel>
-          <CustomTabPanel key="content-6" value={tabValue} index={6}>
+          <CustomTabPanel key="content-5" value={tabValue} index={5}>
             <pre>{JSON.stringify(devfile.images, null, 2)}</pre>
           </CustomTabPanel>
-          <CustomTabPanel key="content-7" value={tabValue} index={7}>
+          <CustomTabPanel key="content-6" value={tabValue} index={6}>
             <pre>{JSON.stringify(devfile.resources, null, 2)}</pre>
           </CustomTabPanel>
-          <CustomTabPanel key="content-8" value={tabValue} index={8}>
+          <CustomTabPanel key="content-7" value={tabValue} index={7}>
             <pre>{JSON.stringify(devfile.volumes, null, 2)}</pre>
           </CustomTabPanel>
         </main>
