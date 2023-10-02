@@ -23,11 +23,13 @@ import {
   setMetadata, 
   setDefaultCommand, 
   unsetDefaultCommand,
-  deleteCommand
+  deleteCommand,
+  deleteResource
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
 import { GeneralError } from './model/generalError';
+import Resources from './components/tabs/Resources';
 
 function App() {
 
@@ -131,6 +133,23 @@ function App() {
     });
   }
 
+  /**
+   * Delete a cluster resource
+   * 
+   * @param name  name of the cluster resource to delete
+   * @returns 
+   */
+  const onDeleteResource = (name: string) => {
+    if(!confirm('You will delete the resource "'+name+'". Continue?')) {
+      return;
+    }
+    deleteResource(name).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      displayError(error);
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -194,15 +213,21 @@ function App() {
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
             <pre>{JSON.stringify(devfile.events, null, 2)}</pre>
           </CustomTabPanel>
+          
           <CustomTabPanel key="content-4" value={tabValue} index={4}>
             <pre>{JSON.stringify(devfile.containers, null, 2)}</pre>
           </CustomTabPanel>
           <CustomTabPanel key="content-5" value={tabValue} index={5}>
             <pre>{JSON.stringify(devfile.images, null, 2)}</pre>
           </CustomTabPanel>
+          
           <CustomTabPanel key="content-6" value={tabValue} index={6}>
-            <pre>{JSON.stringify(devfile.resources, null, 2)}</pre>
+            <Resources
+              resources={devfile.resources}
+              onDeleteResource={onDeleteResource}
+            />
           </CustomTabPanel>
+          
           <CustomTabPanel key="content-7" value={tabValue} index={7}>
             <pre>{JSON.stringify(devfile.volumes, null, 2)}</pre>
           </CustomTabPanel>

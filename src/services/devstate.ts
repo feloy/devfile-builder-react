@@ -46,3 +46,8 @@ export const unsetDefaultCommand = (command: string): Promise<AxiosResponse<Devf
 export const deleteCommand = (command: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
     return axios.delete<DevfileContent>(base+"/command/"+command);
 }
+
+export const deleteResource = (resource: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
+    return axios.delete<DevfileContent>(base+"/resource/"+resource);
+  }
+
