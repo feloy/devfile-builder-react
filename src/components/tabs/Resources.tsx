@@ -55,44 +55,43 @@ function Resources({
     }
 
     const getResourceByName = (name: string): Resource => {
-        return resources.filter(r => r.name == name)[0];
+        const result = resources.filter(r => r.name == name)[0];
+        if (result.uri === undefined) {
+            result.uri = '';
+        }
+        if (result.inlined === undefined) {
+            result.inlined = '';
+        }
+        return result;
     }
 
     return <>
-        <Box sx={{textAlign: "right"}}>
+        {!displayForm && <Box sx={{textAlign: "right"}}>
             <AddResource onAddResource={handleAddResource}/>
-        </Box>
-        <ResourcesList 
-            display={!displayForm}            
+        </Box>}
+        {!displayForm && <ResourcesList 
             resources={resources} 
             onDeleteResource={onDeleteResource}
             onEditResource={handleEditResource}
-        />
-        <AddResourceForm 
-            display={displayForm} 
+        />}
+        { displayForm && <AddResourceForm 
             resource={editedResource}
             onCancel={() => setDisplayForm(false) } 
             onCreate={ (resource: Resource) => handleCreateResource(resource) } 
             onSave={(resource: Resource) => handleSaveResource(resource) }
-        />
+        />}
     </>
 }
 
 function ResourcesList({
-    display,
     resources,
     onDeleteResource,
     onEditResource
 }: {
-    display: boolean,
     resources: Resource[],
     onDeleteResource: (name: string) => void,
     onEditResource: (name: string) => void
 }) {
-    if (!display) {
-        return <div></div>
-    }
-
     const displayResources = () => {
         return resources.map((resource: Resource) => {
             return (
