@@ -8,7 +8,7 @@ function AddApplyCommand({
     onCancel: () => void
 }) {
     if (!display) {
-        return;
+        return <div></div>;
     }
     return (
         <Card>

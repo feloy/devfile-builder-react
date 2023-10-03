@@ -31,7 +31,7 @@ import { getDevfile as getDevfileFromApi } from './services/api';
 import { GeneralError } from './model/generalError';
 import Resources from './components/tabs/Resources';
 
-function App() {
+export const App = () => {
 
   // DEVFILE STATE
   const [devfile, setDevfile] = useState({} as DevfileContent)
@@ -104,7 +104,7 @@ function App() {
    * @param checked is the command the default command of the group?
    */
   const onDefaultChange = (name: string, group: string, checked: boolean) => {
-    var cmd = undefined;
+    var cmd;
     if (checked) {
       cmd = setDefaultCommand;
     } else {
@@ -175,7 +175,6 @@ function App() {
   }
 
   return (
-    <>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
           <Toolbar>
@@ -233,7 +232,6 @@ function App() {
           </CustomTabPanel>
         </main>
       </Box>
-    </>
   )
 }
 
