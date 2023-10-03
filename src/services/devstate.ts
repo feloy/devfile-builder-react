@@ -60,3 +60,11 @@ export const addResource = (resource: Resource): Promise<AxiosResponse<DevfileCo
       deployByDefault: resource.deployByDefault,
     });
 }
+
+export const saveResource = (resource: Resource): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.patch<DevfileContent>(base+"/resource/"+resource.name, {
+      inlined: resource.inlined,
+      uri: resource.uri,
+      deployByDefault: resource.deployByDefault,
+    });
+}

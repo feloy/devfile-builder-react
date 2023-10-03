@@ -25,7 +25,8 @@ import {
   unsetDefaultCommand,
   deleteCommand,
   deleteResource,
-  addResource
+  addResource,
+  saveResource
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -156,9 +157,25 @@ export const App = () => {
    * Create a cluster resource
    * 
    * @param resource resource to create
+   * @returns A promise to true when the resource has been saved correctly
    */
   const onCreateResource = (resource: Resource): Promise<boolean> => {
     return addResource(resource).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
+  /**
+   * Update a resource
+   * @param resource resource to update 
+   * @returns A promise to true when the resource has been saved correctly
+   */
+  const onSaveResource = (resource: Resource): Promise<boolean> => {
+    return saveResource(resource).then((d) => {
       setDevfile(d.data);
       return true;
     }).catch((error: AxiosError) => {
@@ -242,6 +259,7 @@ export const App = () => {
               resources={devfile.resources}
               onDeleteResource={onDeleteResource}
               onCreateResource={onCreateResource}
+              onSaveResource={onSaveResource}
             />
           </CustomTabPanel>
           

@@ -1,34 +1,53 @@
 import { Button, Card, CardActions, CardContent, CardHeader, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextField } from "@mui/material";
 import { Resource } from "../../model/resource";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function AddResourceForm({
     display,
+    resource,
     onCancel,
-    onCreate
+    onCreate,
+    onSave
 }: {
     display: boolean,
+    resource: Resource,
     onCancel: () => void,
-    onCreate: (resource: Resource) => void
+    onCreate: (resource: Resource) => void,
+    onSave: (resource: Resource) => void
 }) {
-
-    const initialResource: Resource = {
-        name: '',
-        deployByDefault: 'never',
-        uri: '',
-        inlined: '',
-        orphan: false,
-    }
-    const [ resourceValue, setResourceValue] = useState(initialResource)
+    const [ resourceValue, setResourceValue] = useState(resource);
     const [ useUri, setUseUri ] = useState(true);
+    const [editing, setEditing] = useState(resource.name !== '');
 
-    if (!display) {
-        return <div></div>;
+    useEffect(() => {
+        if (resource.uri === undefined) {
+            resource.uri = '';
+        }
+        if (resource.inlined === undefined) {
+            resource.inlined = '';
+        }
+        setResourceValue(resource);
+        setUseUri(resource.inlined == "");
+        setEditing(resource.name != '');
+    }, [resource]);
+
+    const handleClick = () => {
+        if (useUri) {
+            resourceValue.inlined = '';
+        } else {
+            resourceValue.uri = '';
+        }
+        if (editing) {
+            onSave(resourceValue);
+        } else {
+            onCreate(resourceValue);
+        }
     }
+    
     return (
-        <Card>
+        <Card hidden={!display}>
             <CardHeader
-                title="Add a Resource"
+                title={editing ? `Edit the resource "${resource.name}"` : 'Add a Resource'}
                 subheader="A Resource defines a Kubernetes resource. Its definition can be given either by a URI pointing to a manifest file or by an inlined YAML manifest."
             ></CardHeader>
             <CardContent>
@@ -36,6 +55,7 @@ function AddResourceForm({
                     <Grid item xs={6}>
                         <TextField
                             label="Name" fullWidth
+                            disabled={editing}
                             placeholder="Unique name to identify the resource"
                             value={resourceValue.name}
                             onChange={(e) => setResourceValue({...resourceValue, name: e.target.value})}
@@ -82,7 +102,7 @@ function AddResourceForm({
                 </Grid>
             </CardContent>
             <CardActions>
-                <Button variant="contained" color="primary" onClick={() => onCreate(resourceValue)}>Create</Button>
+                <Button variant="contained" color="primary" onClick={handleClick}>{editing ? "Save" : "Create" }</Button>
                 <Button onClick={onCancel}>Cancel</Button>
             </CardActions>
         </Card>
