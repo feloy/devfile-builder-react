@@ -1,16 +1,8 @@
-import { Fab, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
+import { Button, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import WidthNormalIcon from '@mui/icons-material/WidthNormal';
 import ImageIcon from '@mui/icons-material/Image';
 import DescriptionIcon from '@mui/icons-material/Description';
-
-const fabStyle = {
-    position: 'fixed',
-    bottom: "16px",
-    right: "calc((100vw - 1060px)/2 + 16px)"
-  };
-  
 
 function AddCommand(
     {
@@ -32,9 +24,9 @@ function AddCommand(
     };
   
     return <>
-        <Fab sx={fabStyle} color="primary" onClick={handleClick}>
-            <AddIcon />
-        </Fab>
+        <Button color="primary" onClick={handleClick}>
+            Add a Command
+        </Button>
         <Menu
             anchorEl={anchorEl}
             open={open}

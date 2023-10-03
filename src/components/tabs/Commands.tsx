@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography, CardActions, Button } from '@mui/material';
+import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography, CardActions, Button, Box } from '@mui/material';
 
 import { Command } from '../../model/command';
 import { ExecCommand } from '../../model/execCommand';
@@ -23,6 +23,57 @@ function Commands({
     onDefaultChange: (name: string, group: string, checked: boolean) => void;
     onDeleteCommand: (name: string) => void;
 }) {
+    
+    const [commandToDisplay, setCommandToDisplay] = useState('');
+
+    const handleAddCommand = (commandType: string) =>{
+        setCommandToDisplay(commandType);
+    }
+
+    return <>
+        <Box sx={{textAlign: "right"}}>
+            <AddCommand onAddCommand={handleAddCommand}/>
+        </Box>
+        <CommandsList 
+            display={commandToDisplay == ''}
+            commands={commands} 
+            onDefaultChange={onDefaultChange} 
+            onDeleteCommand={onDeleteCommand} 
+        />
+        <AddExecCommand 
+            display={commandToDisplay == 'exec'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddApplyCommand 
+            display={commandToDisplay == 'apply'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddImageCommand 
+            display={commandToDisplay == 'image'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+        <AddCompositeCommand 
+            display={commandToDisplay == 'composite'}
+            onCancel={() => setCommandToDisplay('')}
+        />
+    </>
+}
+
+function CommandsList({
+    display,
+    commands, 
+    onDefaultChange, 
+    onDeleteCommand
+}: {
+    display: boolean,
+    commands: Command[];
+    onDefaultChange: (name: string, group: string, checked: boolean) => void;
+    onDeleteCommand: (name: string) => void;
+}) {
+    if (!display) {
+        return <div></div>
+    }
+
     const displayCommands = (group: string) => {
         const list = commands
         .filter((command: Command) => command.group == group);
@@ -43,15 +94,7 @@ function Commands({
                 )
             });
     }
-    
-    const [commandToDisplay, setCommandToDisplay] = useState('');
-
-    const handleAddCommand = (commandType: string) =>{
-        console.log("add command "+commandType);
-        setCommandToDisplay(commandType);
-    }
-
-    return <>
+    return (
         <List>
             <ListSubheader>Build Commands</ListSubheader>
             { displayCommands('build') }                
@@ -66,25 +109,9 @@ function Commands({
             <ListSubheader>Generic Commands</ListSubheader>
             { displayCommands('') }
         </List>
-        <AddCommand onAddCommand={handleAddCommand}/>
-        <AddExecCommand 
-            display={commandToDisplay == 'exec'}
-            onCancel={() => setCommandToDisplay('')}
-        />
-        <AddApplyCommand 
-            display={commandToDisplay == 'apply'}
-            onCancel={() => setCommandToDisplay('')}
-        />
-        <AddImageCommand 
-            display={commandToDisplay == 'image'}
-            onCancel={() => setCommandToDisplay('')}
-        />
-        <AddCompositeCommand 
-            display={commandToDisplay == 'composite'}
-            onCancel={() => setCommandToDisplay('')}
-        />
-    </>
+    )
 }
+
 
 function CommandItem({
     command, 
