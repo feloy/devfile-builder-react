@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 import { DevfileContent } from "../model/devfileContent";
 import { Metadata } from "../model/metadata";
+import { Resource } from "../model/resource";
 
 const base = "/api/v1/devstate";
 
@@ -49,5 +50,13 @@ export const deleteCommand = (command: string): Promise<AxiosResponse<DevfileCon
 
 export const deleteResource = (resource: string): Promise<AxiosResponse<DevfileContent, any>> =>  {
     return axios.delete<DevfileContent>(base+"/resource/"+resource);
-  }
+}
 
+export const addResource = (resource: Resource): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.post<DevfileContent>(base+"/resource", {
+      name: resource.name,
+      inlined: resource.inlined,
+      uri: resource.uri,
+      deployByDefault: resource.deployByDefault,
+    });
+}

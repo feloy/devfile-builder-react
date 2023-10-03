@@ -24,12 +24,14 @@ import {
   setDefaultCommand, 
   unsetDefaultCommand,
   deleteCommand,
-  deleteResource
+  deleteResource,
+  addResource
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
 import { GeneralError } from './model/generalError';
 import Resources from './components/tabs/Resources';
+import { Resource } from './model/resource';
 
 export const App = () => {
 
@@ -150,6 +152,21 @@ export const App = () => {
     });
   }
 
+  /**
+   * Create a cluster resource
+   * 
+   * @param resource resource to create
+   */
+  const onCreateResource = (resource: Resource): Promise<boolean> => {
+    return addResource(resource).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -224,6 +241,7 @@ export const App = () => {
             <Resources
               resources={devfile.resources}
               onDeleteResource={onDeleteResource}
+              onCreateResource={onCreateResource}
             />
           </CustomTabPanel>
           
