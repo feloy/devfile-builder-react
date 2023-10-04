@@ -19,7 +19,7 @@ function MetadataForm({
     const semverPatternRegex = new RegExp(semverPattern);
 
     const onVersionChange = (v: string) => {
-        if (semverPatternRegex.test(v)) {
+        if (v == '' || semverPatternRegex.test(v)) {
             setVersionErrorMsg('');
         } else {
             setVersionErrorMsg('Examples: 1.0.4, 1.4.7-alpha1')
