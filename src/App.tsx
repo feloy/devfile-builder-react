@@ -26,13 +26,15 @@ import {
   deleteCommand,
   deleteResource,
   addResource,
-  saveResource
+  saveResource,
+  addApplyCommand
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
 import { GeneralError } from './model/generalError';
 import Resources from './components/tabs/Resources';
 import { Resource } from './model/resource';
+import { ApplyCommandToCreate } from './components/forms/AddApplyCommand';
 
 export const App = () => {
 
@@ -137,6 +139,35 @@ export const App = () => {
   }
 
   /**
+   * Create a new Apply Command
+   * 
+   * @param cmd the Apply command to create, and the related resource if needed
+   */
+  const onCreateApplyCommand = (cmd: ApplyCommandToCreate): Promise<boolean> => {
+    const doCreateCommand = (): Promise<boolean> => {
+      return addApplyCommand(cmd.name, cmd.applyCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.resources.length > 0) {
+      const resourceToCreate = cmd.resources[0];
+      return addResource(resourceToCreate).then(_ => {
+        return doCreateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doCreateCommand();
+    }
+  }
+
+  /**
    * Delete a cluster resource
    * 
    * @param name  name of the cluster resource to delete
@@ -238,8 +269,10 @@ export const App = () => {
           <CustomTabPanel key="content-2" value={tabValue} index={2}>
             <Commands
               commands={devfile.commands}
+              resourceNames={devfile.resources?.map(r => r.name)}
               onDefaultChange={onDefaultChange}
               onDeleteCommand={onDeleteCommand}
+              onCreateApplyCommand={onCreateApplyCommand}
             />
           </CustomTabPanel>
 

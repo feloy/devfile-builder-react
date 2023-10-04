@@ -4,7 +4,7 @@ import AddResource from "../fabs/AddResource";
 import { useState } from "react";
 import AddResourceForm from "../forms/AddResourceForm";
 
-const emptyResource: Resource = {
+export const emptyResource: Resource = {
     name: '',
     deployByDefault: 'never',
     uri: '',

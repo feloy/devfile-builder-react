@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { DevfileContent } from "../model/devfileContent";
 import { Metadata } from "../model/metadata";
 import { Resource } from "../model/resource";
+import { ApplyCommand } from "../model/applyCommand";
 
 const base = "/api/v1/devstate";
 
@@ -66,5 +67,12 @@ export const saveResource = (resource: Resource): Promise<AxiosResponse<DevfileC
       inlined: resource.inlined,
       uri: resource.uri,
       deployByDefault: resource.deployByDefault,
+    });
+}
+
+export const addApplyCommand = (name: string, cmd: ApplyCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.post<DevfileContent>(base+"/applyCommand", {
+      name: name,
+      component: cmd.component,
     });
 }

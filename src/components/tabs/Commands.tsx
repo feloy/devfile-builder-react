@@ -9,19 +9,23 @@ import { ImageCommand } from '../../model/imageCommand';
 import { CompositeCommand } from '../../model/compositeCommand';
 import AddCommand from '../fabs/AddCommand';
 import AddExecCommand from '../forms/AddExecCommand';
-import AddApplyCommand from '../forms/AddApplyCommand';
+import AddApplyCommand, { ApplyCommandToCreate } from '../forms/AddApplyCommand';
 import AddImageCommand from '../forms/AddImageCommand';
 import AddCompositeCommand from '../forms/AddCompositeCommand';
 
 
 function Commands({
     commands, 
+    resourceNames,
     onDefaultChange, 
-    onDeleteCommand
+    onDeleteCommand,
+    onCreateApplyCommand
 }: {
-    commands: Command[];
-    onDefaultChange: (name: string, group: string, checked: boolean) => void;
-    onDeleteCommand: (name: string) => void;
+    commands: Command[]
+    resourceNames: string[],
+    onDefaultChange: (name: string, group: string, checked: boolean) => void,
+    onDeleteCommand: (name: string) => void,
+    onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>
 }) {
     
     const [commandToDisplay, setCommandToDisplay] = useState('');
@@ -30,10 +34,18 @@ function Commands({
         setCommandToDisplay(commandType);
     }
 
+    const handleCreateApplyCommand = (cmd: ApplyCommandToCreate) => {
+        onCreateApplyCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
     return <>
-        <Box sx={{textAlign: "right"}}>
+        {commandToDisplay == '' && <Box sx={{textAlign: "right"}}>
             <AddCommand onAddCommand={handleAddCommand}/>
-        </Box>
+        </Box>}
         {commandToDisplay == '' && <CommandsList 
             commands={commands} 
             onDefaultChange={onDefaultChange} 
@@ -43,7 +55,9 @@ function Commands({
             onCancel={() => setCommandToDisplay('')}
         />}
         {commandToDisplay == 'apply' && <AddApplyCommand 
+            resourceNames={resourceNames}
             onCancel={() => setCommandToDisplay('')}
+            onCreate={ handleCreateApplyCommand }
         />}
         {commandToDisplay == 'image' && <AddImageCommand 
             onCancel={() => setCommandToDisplay('')}
