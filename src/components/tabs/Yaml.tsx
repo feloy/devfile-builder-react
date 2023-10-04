@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,6 +16,10 @@ function Yaml({
 }) {
     const [contentValue, setContentValue] = useState(content)
 
+    useEffect(() => {
+        setContentValue(content);
+    }, [content]);
+
     return <>
         <Box width="100%">
             <TextField
@@ -23,7 +27,6 @@ function Yaml({
                 multiline
                 fullWidth
                 minRows="20" maxRows="20"
-                defaultValue={content} /* It should not be necessary for a controlled component (feloy) */
                 value={contentValue}
                 onChange={(e) => { setContentValue(e.target.value); }}
             />
