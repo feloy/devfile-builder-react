@@ -27,7 +27,10 @@ import {
   deleteResource,
   addResource,
   saveResource,
-  addApplyCommand
+  addApplyCommand,
+  deleteImage,
+  addImage,
+  saveImage
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -35,6 +38,8 @@ import { GeneralError } from './model/generalError';
 import Resources from './components/tabs/Resources';
 import { Resource } from './model/resource';
 import { ApplyCommandToCreate } from './components/forms/AddApplyCommand';
+import Images from './components/tabs/Images';
+import { Image } from './model/image';
 
 export const App = () => {
 
@@ -215,6 +220,52 @@ export const App = () => {
     });
   }
 
+  /**
+   * Delete an Image
+   * 
+   * @param name name of the image to delete
+   */
+  const onDeleteImage = (name: string) => {
+    if(!confirm('You will delete the image "'+name+'". Continue?')) {
+      return;
+    }
+    deleteImage(name).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      displayError(error);
+    });
+  }
+
+  /**
+   * Create a new image
+   * 
+   * @param image image to add to the Devfile
+   */
+  const onCreateImage = (image: Image): Promise<boolean> => {
+    return addImage(image).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
+  /**
+   * Update an Image
+   * 
+   * @param image image to save
+   */
+  const onSaveImage = (image: Image): Promise<boolean> => {
+    return saveImage(image).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -283,8 +334,14 @@ export const App = () => {
           <CustomTabPanel key="content-4" value={tabValue} index={4}>
             <pre>{JSON.stringify(devfile.containers, null, 2)}</pre>
           </CustomTabPanel>
+
           <CustomTabPanel key="content-5" value={tabValue} index={5}>
-            <pre>{JSON.stringify(devfile.images, null, 2)}</pre>
+            <Images
+              images={devfile.images}
+              onDeleteImage={onDeleteImage}
+              onCreateImage={onCreateImage}
+              onSaveImage={onSaveImage}
+            />
           </CustomTabPanel>
           
           <CustomTabPanel key="content-6" value={tabValue} index={6}>

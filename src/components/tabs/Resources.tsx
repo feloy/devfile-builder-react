@@ -6,7 +6,7 @@ import AddResourceForm from "../forms/AddResourceForm";
 
 export const emptyResource: Resource = {
     name: '',
-    deployByDefault: 'never',
+    deployByDefault: 'undefined',
     uri: '',
     inlined: '',
     orphan: false,

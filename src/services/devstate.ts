@@ -4,6 +4,7 @@ import { DevfileContent } from "../model/devfileContent";
 import { Metadata } from "../model/metadata";
 import { Resource } from "../model/resource";
 import { ApplyCommand } from "../model/applyCommand";
+import { Image } from "../model/image";
 
 const base = "/api/v1/devstate";
 
@@ -74,5 +75,32 @@ export const addApplyCommand = (name: string, cmd: ApplyCommand): Promise<AxiosR
     return axios.post<DevfileContent>(base+"/applyCommand", {
       name: name,
       component: cmd.component,
+    });
+}
+
+export const deleteImage = (image: string): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.delete<DevfileContent>(base+"/image/"+image);
+}
+
+export const addImage = (image: Image): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.post<DevfileContent>(base+"/image", {
+      name: image.name,
+      imageName: image.imageName,
+      args: image.args,
+      buildContext: image.buildContext,
+      rootRequired: image.rootRequired,
+      uri: image.uri,
+      autoBuild: image.autoBuild,
+    });
+}
+
+export const saveImage = (image: Image): Promise<AxiosResponse<DevfileContent, any>> => {
+    return axios.patch<DevfileContent>(base+"/image/"+image.name, {
+      imageName: image.imageName,
+      args: image.args,
+      buildContext: image.buildContext,
+      rootRequired: image.rootRequired,
+      uri: image.uri,
+      autoBuild: image.autoBuild,
     });
 }

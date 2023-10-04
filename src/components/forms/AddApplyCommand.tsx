@@ -4,7 +4,7 @@ import AddResourceForm from "./AddResourceForm";
 import { emptyResource } from "../tabs/Resources";
 import { Resource } from "../../model/resource";
 import { ApplyCommand } from "../../model/applyCommand";
-import { componentIdPatternRegex } from "./consts";
+import { commandIdPatternRegex } from "./consts";
 
 export interface ApplyCommandToCreate {
     name: string,
@@ -55,7 +55,7 @@ function AddApplyCommand({
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
     const isNameValid = (v: string): boolean => {
-        return componentIdPatternRegex.test(v);
+        return commandIdPatternRegex.test(v);
     }
     const updateNameErrorMsg = (valid: boolean) => {
         setNameErrorMsg(valid ? '' : 'Lowercase words separated by dashes. Ex: my-apply-command');
