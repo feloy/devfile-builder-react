@@ -10,22 +10,26 @@ import { CompositeCommand } from '../../model/compositeCommand';
 import AddCommand from '../fabs/AddCommand';
 import AddExecCommand from '../forms/AddExecCommand';
 import AddApplyCommand, { ApplyCommandToCreate } from '../forms/AddApplyCommand';
-import AddImageCommand from '../forms/AddImageCommand';
+import AddImageCommand, { ImageCommandToCreate } from '../forms/AddImageCommand';
 import AddCompositeCommand from '../forms/AddCompositeCommand';
 
 
 function Commands({
     commands, 
     resourceNames,
+    imageNames,
     onDefaultChange, 
     onDeleteCommand,
-    onCreateApplyCommand
+    onCreateApplyCommand,
+    onCreateImageCommand
 }: {
     commands: Command[]
     resourceNames: string[],
+    imageNames: string[],
     onDefaultChange: (name: string, group: string, checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
-    onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>
+    onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
+    onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>
 }) {
     
     const [commandToDisplay, setCommandToDisplay] = useState('');
@@ -36,6 +40,14 @@ function Commands({
 
     const handleCreateApplyCommand = (cmd: ApplyCommandToCreate) => {
         onCreateApplyCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
+    const handleCreateImageCommand = (cmd: ImageCommandToCreate) => {
+        onCreateImageCommand(cmd).then((success: boolean) => {
             if (success) {
                 setCommandToDisplay('');
             }
@@ -60,7 +72,9 @@ function Commands({
             onCreate={ handleCreateApplyCommand }
         />}
         {commandToDisplay == 'image' && <AddImageCommand 
+            imageNames={imageNames}
             onCancel={() => setCommandToDisplay('')}
+            onCreate={ handleCreateImageCommand }
         />}
         {commandToDisplay == 'composite' && <AddCompositeCommand 
             onCancel={() => setCommandToDisplay('')}

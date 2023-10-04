@@ -40,6 +40,7 @@ import { Resource } from './model/resource';
 import { ApplyCommandToCreate } from './components/forms/AddApplyCommand';
 import Images from './components/tabs/Images';
 import { Image } from './model/image';
+import { ImageCommandToCreate } from './components/forms/AddImageCommand';
 
 export const App = () => {
 
@@ -162,6 +163,36 @@ export const App = () => {
     if (cmd.resources.length > 0) {
       const resourceToCreate = cmd.resources[0];
       return addResource(resourceToCreate).then(_ => {
+        return doCreateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doCreateCommand();
+    }
+  }
+
+
+  /**
+   * Create a new Image command
+   * 
+   * @param cmd the Image command to create, and the related image if needed
+   */
+  const onCreateImageCommand = (cmd: ImageCommandToCreate): Promise<boolean> => {
+    const doCreateCommand = (): Promise<boolean> => {
+      return addApplyCommand(cmd.name, cmd.imageCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.images.length > 0) {
+      const imageToCreate = cmd.images[0];
+      return addImage(imageToCreate).then(_ => {
         return doCreateCommand();
       }).catch((error: AxiosError) => {
         displayError(error);
@@ -321,9 +352,11 @@ export const App = () => {
             <Commands
               commands={devfile.commands}
               resourceNames={devfile.resources?.map(r => r.name)}
+              imageNames={devfile.images?.map(i => i.name)}
               onDefaultChange={onDefaultChange}
               onDeleteCommand={onDeleteCommand}
               onCreateApplyCommand={onCreateApplyCommand}
+              onCreateImageCommand={onCreateImageCommand}
             />
           </CustomTabPanel>
 
