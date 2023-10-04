@@ -34,46 +34,35 @@ function Commands({
         <Box sx={{textAlign: "right"}}>
             <AddCommand onAddCommand={handleAddCommand}/>
         </Box>
-        <CommandsList 
-            display={commandToDisplay == ''}
+        {commandToDisplay == '' && <CommandsList 
             commands={commands} 
             onDefaultChange={onDefaultChange} 
             onDeleteCommand={onDeleteCommand} 
-        />
-        <AddExecCommand 
-            display={commandToDisplay == 'exec'}
+        />}
+        {commandToDisplay == 'exec' && <AddExecCommand 
             onCancel={() => setCommandToDisplay('')}
-        />
-        <AddApplyCommand 
-            display={commandToDisplay == 'apply'}
+        />}
+        {commandToDisplay == 'apply' && <AddApplyCommand 
             onCancel={() => setCommandToDisplay('')}
-        />
-        <AddImageCommand 
-            display={commandToDisplay == 'image'}
+        />}
+        {commandToDisplay == 'image' && <AddImageCommand 
             onCancel={() => setCommandToDisplay('')}
-        />
-        <AddCompositeCommand 
-            display={commandToDisplay == 'composite'}
+        />}
+        {commandToDisplay == 'composite' && <AddCompositeCommand 
             onCancel={() => setCommandToDisplay('')}
-        />
+        />}
     </>
 }
 
 function CommandsList({
-    display,
     commands, 
     onDefaultChange, 
     onDeleteCommand
 }: {
-    display: boolean,
     commands: Command[];
     onDefaultChange: (name: string, group: string, checked: boolean) => void;
     onDeleteCommand: (name: string) => void;
 }) {
-    if (!display) {
-        return <div></div>
-    }
-
     const displayCommands = (group: string) => {
         const list = commands
         .filter((command: Command) => command.group == group);

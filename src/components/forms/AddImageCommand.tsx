@@ -1,14 +1,10 @@
 import { Button, Card, CardActions, CardContent, CardHeader } from "@mui/material";
 
-function AddImageCommand({display,
+function AddImageCommand({
     onCancel
 }: {
-    display: boolean,
     onCancel: () => void
 }) {
-    if (!display) {
-        return <div></div>;
-    }
     return (
         <Card>
             <CardHeader title="Add an Image Command"></CardHeader>

@@ -1,14 +1,10 @@
 import { Button, Card, CardActions, CardContent, CardHeader } from "@mui/material";
 
-function AddExecCommand({display,
+function AddExecCommand({
     onCancel
 }: {
-    display: boolean,
     onCancel: () => void
 }) {
-    if (!display) {
-        return <div></div>;
-    }
     return (
         <Card>
             <CardHeader title="Add an Exec Command"></CardHeader>
