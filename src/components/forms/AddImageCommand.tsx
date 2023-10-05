@@ -2,7 +2,7 @@ import { Button, Card, CardActions, CardContent, CardHeader, FormControl, FormHe
 import AddImageForm from "./AddImageForm";
 import { ImageCommand } from "../../model/imageCommand";
 import { Image } from "../../model/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { commandIdPatternRegex } from "./consts";
 import { emptyImage } from "../tabs/Images";
 
@@ -51,6 +51,10 @@ function AddImageCommand({
         }
         return inv;
     }
+
+    useEffect(() => {
+        setInvalid(computeInvalid(commandValue));
+    }, [commandValue]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');

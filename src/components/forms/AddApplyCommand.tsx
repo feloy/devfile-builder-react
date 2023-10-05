@@ -1,5 +1,5 @@
 import { Button, Card, CardActions, CardContent, CardHeader, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddResourceForm from "./AddResourceForm";
 import { emptyResource } from "../tabs/Resources";
 import { Resource } from "../../model/resource";
@@ -51,6 +51,10 @@ function AddApplyCommand({
         }
         return inv;
     }
+
+    useEffect(() => {
+        setInvalid(computeInvalid(commandValue));
+    }, [commandValue]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
