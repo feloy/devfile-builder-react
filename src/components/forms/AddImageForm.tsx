@@ -2,11 +2,13 @@ import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, FormContr
 import { Image } from "../../model/image";
 import { useEffect, useState } from "react";
 import { componentIdPatternRegex } from "./consts";
+import MultiTextInput from "../inputs/MultiTextInput";
 
 interface Invalid {
     nameField?: boolean
     imageNameField?: boolean
     uriField?: boolean
+    buildArgs?: boolean
 }
 
 function AddImageForm({
@@ -38,6 +40,9 @@ function AddImageForm({
         }
         if (!isUriValid(image.uri)) {
             inv.uriField = true;
+        }
+        if (!isArgsValid(image.args)) {
+            inv.buildArgs = true;
         }
         return inv;
     }
@@ -97,6 +102,16 @@ function AddImageForm({
 
     const onRootRequiredChange = (checked: boolean) => {
         const newValue = {...imageValue, rootRequired: checked};
+        setImageValue(newValue);
+    }
+
+    const isArgsValid = (args: string[]): boolean => {
+        return args?.filter(v => v == "").length == 0;
+    }
+
+    const onArgsChange = (args: string[]) => {
+        const newValue = {...imageValue, args: args};
+        setInvalid(computeInvalid(newValue));
         setImageValue(newValue);
     }
 
@@ -184,7 +199,11 @@ function AddImageForm({
                     onBlur={(e) => onBuildContextChange(e.target.value)}
                 />
             </Grid>
-            {/* TODO(feloy) Build Args */}
+            <MultiTextInput
+                value={imageValue.args}
+                onChange={(args) => {onArgsChange(args)}}
+                label="Build Arg"
+            ></MultiTextInput>
             <Grid item xs={12}>
                 <FormControlLabel
                     control={<Checkbox />}
