@@ -30,7 +30,8 @@ import {
   addApplyCommand,
   deleteImage,
   addImage,
-  saveImage
+  saveImage,
+  addCompositeCommand
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -41,6 +42,7 @@ import { ApplyCommandToCreate } from './components/forms/AddApplyCommand';
 import Images from './components/tabs/Images';
 import { Image } from './model/image';
 import { ImageCommandToCreate } from './components/forms/AddImageCommand';
+import { CompositeCommandToCreate } from './components/forms/AddCompositeCommand';
 
 export const App = () => {
 
@@ -204,6 +206,21 @@ export const App = () => {
   }
 
   /**
+   * Create a new Composite command
+   * 
+   * @param cmd the Composite command to create
+   */
+  const onCreateCompositeCommand = (cmd: CompositeCommandToCreate): Promise<boolean> => {
+    return addCompositeCommand(cmd.name, cmd.compositeCmd).then(d => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
+  /**
    * Delete a cluster resource
    * 
    * @param name  name of the cluster resource to delete
@@ -357,6 +374,7 @@ export const App = () => {
               onDeleteCommand={onDeleteCommand}
               onCreateApplyCommand={onCreateApplyCommand}
               onCreateImageCommand={onCreateImageCommand}
+              onCreateCompositeCommand={onCreateCompositeCommand}
             />
           </CustomTabPanel>
 

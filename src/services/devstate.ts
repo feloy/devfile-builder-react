@@ -5,6 +5,7 @@ import { Metadata } from "../model/metadata";
 import { Resource } from "../model/resource";
 import { ApplyCommand } from "../model/applyCommand";
 import { Image } from "../model/image";
+import { CompositeCommand } from "../model/compositeCommand";
 
 const base = "/api/v1/devstate";
 
@@ -103,4 +104,12 @@ export const saveImage = (image: Image): Promise<AxiosResponse<DevfileContent, a
       uri: image.uri,
       autoBuild: image.autoBuild,
     });
+}
+
+export const addCompositeCommand = (name: string, cmd: CompositeCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.post<DevfileContent>(base+"/compositeCommand", {
+    name: name,
+    parallel: cmd.parallel,
+    commands: cmd.commands,
+  });
 }

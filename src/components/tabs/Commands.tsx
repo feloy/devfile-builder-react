@@ -11,7 +11,7 @@ import AddCommand from '../fabs/AddCommand';
 import AddExecCommand from '../forms/AddExecCommand';
 import AddApplyCommand, { ApplyCommandToCreate } from '../forms/AddApplyCommand';
 import AddImageCommand, { ImageCommandToCreate } from '../forms/AddImageCommand';
-import AddCompositeCommand from '../forms/AddCompositeCommand';
+import AddCompositeCommand, { CompositeCommandToCreate } from '../forms/AddCompositeCommand';
 
 
 function Commands({
@@ -21,7 +21,8 @@ function Commands({
     onDefaultChange, 
     onDeleteCommand,
     onCreateApplyCommand,
-    onCreateImageCommand
+    onCreateImageCommand,
+    onCreateCompositeCommand
 }: {
     commands: Command[]
     resourceNames: string[],
@@ -29,7 +30,8 @@ function Commands({
     onDefaultChange: (name: string, group: string, checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
     onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
-    onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>
+    onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>,
+    onCreateCompositeCommand: (cmd: CompositeCommandToCreate) => Promise<boolean>,
 }) {
     
     const [commandToDisplay, setCommandToDisplay] = useState('');
@@ -48,6 +50,14 @@ function Commands({
 
     const handleCreateImageCommand = (cmd: ImageCommandToCreate) => {
         onCreateImageCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
+    const handleCreateCompositeCommand = (cmd: CompositeCommandToCreate) =>{
+        onCreateCompositeCommand(cmd).then((success: boolean) => {
             if (success) {
                 setCommandToDisplay('');
             }
@@ -77,7 +87,9 @@ function Commands({
             onCreate={ handleCreateImageCommand }
         />}
         {commandToDisplay == 'composite' && <AddCompositeCommand 
+            commandsNames={commands.map(c => c.name)} 
             onCancel={() => setCommandToDisplay('')}
+            onCreate={ handleCreateCompositeCommand }
         />}
     </>
 }
