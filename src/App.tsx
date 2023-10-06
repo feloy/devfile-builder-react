@@ -32,7 +32,10 @@ import {
   addImage,
   saveImage,
   addCompositeCommand,
-  updateEvents
+  updateEvents,
+  addVolume,
+  saveVolume,
+  deleteVolume
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -45,6 +48,8 @@ import { Image } from './model/image';
 import { ImageCommandToCreate } from './components/forms/AddImageCommand';
 import { CompositeCommandToCreate } from './components/forms/AddCompositeCommand';
 import EventsForm from './components/tabs/EventsForm';
+import Volumes from './components/tabs/Volumes';
+import { Volume } from './model/volume';
 
 export const App = () => {
 
@@ -316,6 +321,53 @@ export const App = () => {
     });
   }
 
+
+  /**
+   * Delete a Volume
+   * 
+   * @param name name of the volume to delete
+   */
+  const onDeleteVolume = (name: string) => {
+    if(!confirm('You will delete the volume "'+name+'". Continue?')) {
+      return;
+    }
+    deleteVolume(name).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      displayError(error);
+    });
+  }
+
+  /**
+   * Add a new volume
+   * 
+   * @param volume volume information
+   */
+  const onCreateVolume = (volume: Volume): Promise<boolean> => {
+    return addVolume(volume).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
+  /**
+   * Update an existing volume
+   * 
+   * @param volume volume information
+   */
+  const onSaveVolume = (volume: Volume): Promise<boolean> => {
+    return saveVolume(volume).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
   /**
    * Update events for the specified type
    * 
@@ -427,7 +479,12 @@ export const App = () => {
           </CustomTabPanel>
           
           <CustomTabPanel key="content-7" value={tabValue} index={7}>
-            <pre>{JSON.stringify(devfile.volumes, null, 2)}</pre>
+          <Volumes
+              volumes={devfile.volumes}
+              onDeleteVolume={onDeleteVolume}
+              onCreateVolume={onCreateVolume}
+              onSaveVolume={onSaveVolume}
+            />
           </CustomTabPanel>
         </main>
       </Box>

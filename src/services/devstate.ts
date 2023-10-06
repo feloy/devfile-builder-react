@@ -6,6 +6,7 @@ import { Resource } from "../model/resource";
 import { ApplyCommand } from "../model/applyCommand";
 import { Image } from "../model/image";
 import { CompositeCommand } from "../model/compositeCommand";
+import { Volume } from "../model/volume";
 
 const base = "/api/v1/devstate";
 
@@ -119,4 +120,30 @@ export const updateEvents = (event: "preStart"|"postStart"|"preStop"|"postStop",
     eventName: event,
     commands: commands
   });
+}
+
+export const isQuantityValid = (quantity: string): Promise<AxiosResponse<any, any>> => {
+  return axios.post<{}>(base+"/quantityValid", {
+    quantity: quantity
+  });
+}
+
+
+export const addVolume = (volume: Volume): Promise<AxiosResponse<any, any>> => {
+  return axios.post<DevfileContent>(base+"/volume", {
+    name: volume.name,
+    ephemeral: volume.ephemeral,
+    size: volume.size,
+  });
+}
+
+export const saveVolume = (volume: Volume): Promise<AxiosResponse<any, any>> => {
+  return axios.patch<DevfileContent>(base+"/volume/"+volume.name, {
+    ephemeral: volume.ephemeral,
+    size: volume.size,
+  });
+}
+
+export const deleteVolume = (volume: string): Promise<AxiosResponse<any, any>> => {
+  return axios.delete<DevfileContent>(base+"/volume/"+volume);
 }
