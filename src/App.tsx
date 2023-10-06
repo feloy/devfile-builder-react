@@ -31,7 +31,8 @@ import {
   deleteImage,
   addImage,
   saveImage,
-  addCompositeCommand
+  addCompositeCommand,
+  updateEvents
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -43,6 +44,7 @@ import Images from './components/tabs/Images';
 import { Image } from './model/image';
 import { ImageCommandToCreate } from './components/forms/AddImageCommand';
 import { CompositeCommandToCreate } from './components/forms/AddCompositeCommand';
+import EventsForm from './components/tabs/EventsForm';
 
 export const App = () => {
 
@@ -314,6 +316,22 @@ export const App = () => {
     });
   }
 
+  /**
+   * Update events for the specified type
+   * 
+   * @param eventType type of the event to update
+   * @param commands list of commands for the event type
+   */
+  const handleEventChange = (eventType: "preStart" | "postStart" | "preStop" | "postStop", commands: string[]) => {
+    return updateEvents(eventType, commands).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -379,7 +397,11 @@ export const App = () => {
           </CustomTabPanel>
 
           <CustomTabPanel key="content-3" value={tabValue} index={3}>
-            <pre>{JSON.stringify(devfile.events, null, 2)}</pre>
+            <EventsForm
+              commandsNames={devfile.commands?.map(c => c.name)}
+              value={devfile.events}
+              onChange={ handleEventChange }
+             />
           </CustomTabPanel>
           
           <CustomTabPanel key="content-4" value={tabValue} index={4}>

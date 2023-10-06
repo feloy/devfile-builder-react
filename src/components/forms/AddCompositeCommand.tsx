@@ -1,8 +1,8 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Checkbox, Chip, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme } from "@mui/material";
-import { useTheme } from '@mui/material/styles';
+import { Button, Card, CardActions, CardContent, CardHeader, Checkbox, Chip, FormControl, FormControlLabel, FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Theme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { commandIdPatternRegex } from "./consts";
 import { CompositeCommand } from "../../model/compositeCommand";
+import MultiCommandSelect from "../inputs/MultiCommandSelect";
 
 export interface CompositeCommandToCreate {
     name: string,
@@ -132,7 +132,9 @@ function AddCompositeCommand({
                 </Grid>
                 <Grid item xs={12}>
                     <MultiCommandSelect
+                        label="Commands"
                         commands={commandsNames}
+                        value={commandValue.commands}
                         onChange={(v: string[]) => {onCommandsChange(v)}}
                         onBlur={onCommandsBlur}
                         error={!!commandsErrorMsg}
@@ -149,82 +151,5 @@ function AddCompositeCommand({
     )
 }
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    }
-  }
-};
-
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
-function MultiCommandSelect({
-    commands,
-    onChange,
-    onBlur,
-    error,
-    helperText
-}: {
-    commands: string[],
-    onChange: (values: string[]) => void,
-    onBlur: () => void,
-    error: boolean,
-    helperText: string
-}) {
-    const theme = useTheme();
-    const [values, setValues] = useState<string[]>([]);
-
-    const handleChange = (event: SelectChangeEvent<typeof values>) => {
-        const {
-          target: { value },
-        } = event;
-        const newValues = typeof value === 'string' ? value.split(',') : value
-        setValues(newValues);
-        onChange(newValues);
-    };
-    
-    return (
-        <FormControl sx={{ m: 1, minWidth: 300 }} error={error}>
-            <InputLabel>Commands</InputLabel>
-            <Select
-                multiple
-                value={values}
-                onChange={handleChange}
-                onBlur={() => onBlur()}
-                input={<OutlinedInput label="Commands" />}
-                renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value: string) => (
-                        <Chip key={value} label={value} />
-                      ))}
-                    </Box>
-                )}
-              MenuProps={MenuProps}
-            >
-              {commands.map((command) => (
-                <MenuItem
-                  key={command}
-                  value={command}
-                  style={getStyles(command, values, theme)}
-                >
-                  {command}
-                </MenuItem>
-              ))}
-            </Select>
-            {helperText && <FormHelperText>{helperText}</FormHelperText>}
-        </FormControl>
-    )
-}
 
 export default AddCompositeCommand;

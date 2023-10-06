@@ -113,3 +113,10 @@ export const addCompositeCommand = (name: string, cmd: CompositeCommand): Promis
     commands: cmd.commands,
   });
 }
+
+export const updateEvents = (event: "preStart"|"postStart"|"preStop"|"postStop", commands: string[]): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.put<DevfileContent>(base+"/events", {
+    eventName: event,
+    commands: commands
+  });
+}
