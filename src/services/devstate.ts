@@ -7,6 +7,7 @@ import { ApplyCommand } from "../model/applyCommand";
 import { Image } from "../model/image";
 import { CompositeCommand } from "../model/compositeCommand";
 import { Volume } from "../model/volume";
+import { Container } from "../model/container";
 
 const base = "/api/v1/devstate";
 
@@ -146,4 +147,53 @@ export const saveVolume = (volume: Volume): Promise<AxiosResponse<any, any>> => 
 
 export const deleteVolume = (volume: string): Promise<AxiosResponse<any, any>> => {
   return axios.delete<DevfileContent>(base+"/volume/"+volume);
+}
+
+export const deleteContainer = (container: string): Promise<AxiosResponse<any, any>> => {
+  return axios.delete<DevfileContent>(base+"/container/"+container);
+}
+
+export const addContainer = (container: Container): Promise<AxiosResponse<any, any>> => {
+  return axios.post<DevfileContent>(base+"/container", {
+    name: container.name,
+    image: container.image,
+    command: container.command,
+    args: container.args,
+    env: container.env,
+    memReq: container.memoryRequest,
+    memLimit: container.memoryLimit,
+    cpuReq: container.cpuRequest,
+    cpuLimit: container.cpuLimit,
+    volumeMounts: container.volumeMounts,
+    configureSources: container.configureSources,
+    mountSources: container.mountSources,
+    sourceMapping: container.sourceMapping,
+    annotation: {
+      deployment: container.annotation.deployment,
+      service: container.annotation.service
+    },
+    endpoints: container.endpoints,
+  });
+}
+
+export const saveContainer = (container: Container): Promise<AxiosResponse<any, any>> => {
+  return axios.patch<DevfileContent>(base+"/container/"+container.name, {
+    image: container.image,
+    command: container.command,
+    args: container.args,
+    env: container.env,
+    memReq: container.memoryRequest,
+    memLimit: container.memoryLimit,
+    cpuReq: container.cpuRequest,
+    cpuLimit: container.cpuLimit,
+    volumeMounts: container.volumeMounts,
+    configureSources: container.configureSources,
+    mountSources: container.mountSources,
+    sourceMapping: container.sourceMapping,
+    annotation: {
+      deployment: container.annotation.deployment,
+      service: container.annotation.service
+    },
+    endpoints: container.endpoints,
+  });
 }

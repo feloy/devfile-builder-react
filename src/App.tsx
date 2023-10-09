@@ -35,7 +35,10 @@ import {
   updateEvents,
   addVolume,
   saveVolume,
-  deleteVolume
+  deleteVolume,
+  deleteContainer,
+  saveContainer,
+  addContainer
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -50,6 +53,8 @@ import { CompositeCommandToCreate } from './components/forms/AddCompositeCommand
 import EventsForm from './components/tabs/EventsForm';
 import Volumes from './components/tabs/Volumes';
 import { Volume } from './model/volume';
+import Containers from './components/tabs/Containers';
+import { Container } from './model/container';
 
 export const App = () => {
 
@@ -384,6 +389,68 @@ export const App = () => {
     });
   }
 
+  /**
+   * Delete a Container
+   * 
+   * @param name name of the container to delete
+   */
+  const onDeleteContainer = (name: string) => {
+    if(!confirm('You will delete the container "'+name+'". Continue?')) {
+      return;
+    }
+    deleteContainer(name).then((d) => {
+      setDevfile(d.data);
+    }).catch((error: AxiosError) => {
+      displayError(error);
+    });
+  }
+
+  /**
+   * Add a new container
+   * 
+   * @param container container information
+   */
+  const onCreateContainer = (container: Container, volumesToCreate: Volume[]): Promise<boolean> => {
+    return createVolumes(volumesToCreate, 0, () => {
+      return addContainer(container).then((d) => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    });
+  }
+
+  /**
+   * Update an existing container
+   * 
+   * @param container container information
+   */
+  const onSaveContainer = (container: Container, volumesToCreate: Volume[]): Promise<boolean> => {
+    return createVolumes(volumesToCreate, 0, () => {
+      return saveContainer(container).then((d) => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });  
+    });
+  }
+  
+  const createVolumes = (volumes: Volume[], i: number, next: () => any): Promise<boolean> => {
+    if (volumes.length == i) {
+      return next();
+    }
+    return addVolume(volumes[i]).then(() => {
+      return createVolumes(volumes, i+1, next);
+    }).catch((error: AxiosError) => {
+      alert(error.message);
+      return false;
+    });
+  }
+
   // UTILITY FUNCTIONS
 
   /**
@@ -457,7 +524,13 @@ export const App = () => {
           </CustomTabPanel>
           
           <CustomTabPanel key="content-4" value={tabValue} index={4}>
-            <pre>{JSON.stringify(devfile.containers, null, 2)}</pre>
+            <Containers 
+              volumesNames={devfile.volumes?.map(v => v.name)}
+              containers={devfile.containers}
+              onDeleteContainer={onDeleteContainer}
+              onCreateContainer={onCreateContainer}
+              onSaveContainer={onSaveContainer}
+              />
           </CustomTabPanel>
 
           <CustomTabPanel key="content-5" value={tabValue} index={5}>

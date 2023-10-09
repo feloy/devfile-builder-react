@@ -199,11 +199,13 @@ function AddImageForm({
                     onBlur={(e) => onBuildContextChange(e.target.value)}
                 />
             </Grid>
-            <MultiTextInput
-                value={imageValue.args}
-                onChange={(args) => {onArgsChange(args)}}
-                label="Build Arg"
-            ></MultiTextInput>
+            <Grid item container xs={12} spacing={1}>
+                <MultiTextInput
+                    value={imageValue.args}
+                    onChange={(args) => {onArgsChange(args)}}
+                    label="Build Arg"
+                ></MultiTextInput>
+            </Grid>
             <Grid item xs={12}>
                 <FormControlLabel
                     control={<Checkbox />}
