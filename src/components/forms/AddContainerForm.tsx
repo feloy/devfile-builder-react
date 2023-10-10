@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { componentIdPatternRegex } from "./consts";
 import { Container } from "../../model/container";
 import MultiTextInput from "../inputs/MultiTextInput";
-import MultiKeyValueInput from "../inputs/MultiKeyValueInput";
+import MultiKeyValueInput, { KeyValue } from "../inputs/MultiKeyValueInput";
 import { Env } from "../../model/env";
 import MultiVolumeMount from "../inputs/MultiVolumeMount";
 import { VolumeMount } from "../../model/volumeMount";
@@ -191,6 +191,16 @@ function AddContainerForm({
         
     }
 
+    const onDeploymentAnnotationChange = (values:{ [key: string]: string; }) => {
+        const newValue = {...containerValue, annotation: { ...containerValue.annotation, deployment: values }};
+        setContainerValue(newValue);
+    }
+
+    const onServiceAnnotationChange = (values:{ [key: string]: string; }) => {
+        const newValue = {...containerValue, annotation: { ...containerValue.annotation, service: values }};
+        setContainerValue(newValue);
+    }
+
     const resetValidation = (container: Container) => {
         setNameErrorMsg('');
         setInvalid(computeInvalid(container));
@@ -212,6 +222,20 @@ function AddContainerForm({
 
     const handleVolumesToCreate = (volumes: Volume[]) => {
         setVolumesToCreate(volumes);
+    }
+    
+    const fromKeyValue = (o: KeyValue[]): { [key: string]: string } => {
+        if (o == null || o.length == 0) {
+          return {};
+        }
+        return o.reduce((acc: any, val: KeyValue) => { acc[val.name] = val.value; return acc; }, {});
+    }
+    
+    const toKeyValue = (o: { [key: string]: string }): KeyValue[] => {
+        if (o == null) {
+          return [];
+        }
+        return Object.keys(o).map(k => ({ name: k, value: o[k]}));
     }
     
     return (
@@ -353,10 +377,28 @@ function AddContainerForm({
                     <Section
                         title="Deployment Annotations"
                         subtitle="Annotations added to the Kubernetes Deployment created for running this container" />
+                    <Grid item container xs={12} spacing={2}>
+                        <MultiKeyValueInput
+                            value={toKeyValue(containerValue.annotation.deployment)}
+                            onChange={(annotations) => {onDeploymentAnnotationChange(fromKeyValue(annotations))}}
+                            label="Deployment Annotation"
+                            keyLabel="Name"
+                            valueLabel="Value"
+                        />
+                    </Grid>
 
                     <Section
                         title="Service Annotations"
                         subtitle="Annotations added to the Kubernetes Service created for accessing this container" />
+                    <Grid item container xs={12} spacing={2}>
+                        <MultiKeyValueInput
+                            value={toKeyValue(containerValue.annotation.service)}
+                            onChange={(annotations) => {onServiceAnnotationChange(fromKeyValue(annotations))}}
+                            label="Service Annotation"
+                            keyLabel="Name"
+                            valueLabel="Value"
+                        />
+                    </Grid>
 
 
                 </Grid>

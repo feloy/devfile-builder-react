@@ -169,8 +169,8 @@ export const addContainer = (container: Container): Promise<AxiosResponse<any, a
     mountSources: container.mountSources,
     sourceMapping: container.sourceMapping,
     annotation: {
-      deployment: container.annotation.deployment,
-      service: container.annotation.service
+      deployment: container.annotation.deployment ?? {},
+      service: container.annotation.service ?? {}
     },
     endpoints: container.endpoints,
   });
@@ -191,8 +191,8 @@ export const saveContainer = (container: Container): Promise<AxiosResponse<any, 
     mountSources: container.mountSources,
     sourceMapping: container.sourceMapping,
     annotation: {
-      deployment: container.annotation.deployment,
-      service: container.annotation.service
+      deployment: container.annotation.deployment ?? {},
+      service: container.annotation.service ?? {}
     },
     endpoints: container.endpoints,
   });

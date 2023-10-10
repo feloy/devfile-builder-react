@@ -1,8 +1,12 @@
 import { Delete } from "@mui/icons-material";
 import { Button, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Env } from "../../model/env";
 
+export interface KeyValue {
+    name: string;
+    value: string;
+}
+  
 function MultiKeyValueInput({
     value,
     onChange,
@@ -10,17 +14,13 @@ function MultiKeyValueInput({
     keyLabel,
     valueLabel
 }: {
-    value: Env[],
-    onChange: (newValue: Env[]) => void,
+    value: KeyValue[],
+    onChange: (newValue: KeyValue[]) => void,
     label: string,
     keyLabel: string,
     valueLabel: string
 }) {
-    const [ values, setValues ] = useState<Env[]>(value ?? []);
-
-    useEffect(() => {
-        setValues(value ?? []);
-    }, [value]);
+    const [ values, setValues ] = useState<KeyValue[]>(value ?? []);
 
     useEffect(() => {
         onChange(values);
@@ -76,7 +76,7 @@ function SingleKeyValueInput({
     keyLabel,
     valueLabel
 }: {
-    value: Env,
+    value: KeyValue,
     onKeyChange: (v: string) => void,
     onValueChange: (v: string) => void,
     onDelete: () => void,
