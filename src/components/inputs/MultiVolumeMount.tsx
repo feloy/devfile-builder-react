@@ -166,7 +166,7 @@ function SingleVolumeMount({
         </Grid>
         <Grid item xs={3}>
             <FormControl variant="outlined" fullWidth>
-                <InputLabel>{valueLabel}</InputLabel>
+                <InputLabel>{valueLabel} *</InputLabel>
                 <OutlinedInput
                     type='text'
                     value={value.path}
@@ -180,7 +180,7 @@ function SingleVolumeMount({
                             ><Delete /></IconButton>
                         </InputAdornment>
                     }
-                    label={valueLabel}
+                    label={`${valueLabel} *`}
                     error={!!valueErrorMsg}
                 />
                 <FormHelperText>{valueErrorMsg}</FormHelperText>

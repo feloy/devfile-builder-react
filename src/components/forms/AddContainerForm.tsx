@@ -8,6 +8,8 @@ import { Env } from "../../model/env";
 import MultiVolumeMount from "../inputs/MultiVolumeMount";
 import { VolumeMount } from "../../model/volumeMount";
 import { Volume } from "../../model/volume";
+import MultiEndpoint, { isEndpointValid } from "../inputs/MultiEndpoint";
+import { Endpoint } from "../../model/endpoint";
 
 interface Invalid {
     nameField?: boolean
@@ -16,6 +18,7 @@ interface Invalid {
     argsField?: boolean
     envField?: boolean
     volumeMountsField?: boolean
+    endpointsField?: boolean
 }
 
 function AddContainerForm({
@@ -94,6 +97,11 @@ function AddContainerForm({
         if (!isVolumeMountsValid(container.volumeMounts)) {
             inv.volumeMountsField = true;
         }
+        for (let i=0; i<container.endpoints.length; i++) {
+            if (!isEndpointValid(container.endpoints[i])) {
+                inv.endpointsField = true;
+            }    
+        }
         return inv;
     }
 
@@ -133,6 +141,12 @@ function AddContainerForm({
 
     const onVolumeMountsChange = (mounts: VolumeMount[]) => {
         const newValue = {...containerValue, volumeMounts: mounts};
+        setInvalid(computeInvalid(newValue));
+        setContainerValue(newValue);
+    }
+
+    const onEndpointsChange = (endpoints: Endpoint[]) => {
+        const newValue = {...containerValue, endpoints: endpoints};
         setInvalid(computeInvalid(newValue));
         setContainerValue(newValue);
     }
@@ -242,6 +256,12 @@ function AddContainerForm({
                     <Section
                         title="Endpoints"
                         subtitle="Endpoints exposed by the container" />
+                    <Grid item container xs={12} spacing={2}>
+                        <MultiEndpoint
+                            value={containerValue.endpoints}
+                            onChange={(endpoints) => onEndpointsChange(endpoints)}
+                        />
+                    </Grid>
 
                     <Section
                         title="Resource Usage"
