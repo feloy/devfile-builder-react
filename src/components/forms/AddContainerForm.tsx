@@ -10,6 +10,7 @@ import { VolumeMount } from "../../model/volumeMount";
 import { Volume } from "../../model/volume";
 import MultiEndpoint, { isEndpointValid } from "../inputs/MultiEndpoint";
 import { Endpoint } from "../../model/endpoint";
+import SourceMountConfiguration, { sourceMountConfig } from "../inputs/SourceMountConfiguration";
 
 interface Invalid {
     nameField?: boolean
@@ -151,6 +152,45 @@ function AddContainerForm({
         setContainerValue(newValue);
     }
 
+    const onMemoryRequestChange = (v: string) => {
+        const newValue = {...containerValue, memoryRequest: v};
+        setContainerValue(newValue);
+    }
+
+    const onMemoryLimitChange =  (v: string) => {
+        const newValue = {...containerValue, memoryLimit: v};
+        setContainerValue(newValue);
+    }
+
+    const onCpuRequestChange = (v: string) => {
+        const newValue = {...containerValue, cpuRequest: v};
+        setContainerValue(newValue);
+    }
+
+    const onCpuLimitChange = (v: string) => {
+        const newValue = {...containerValue, cpuLimit: v};
+        setContainerValue(newValue);
+    }
+
+    const toSourceMountConfig = (container: Container) : sourceMountConfig => {
+        return {
+            configure: container.configureSources,
+            mount: container.mountSources,
+            directory: container.sourceMapping
+        }
+    }
+
+    const handleSourceMountConfig = (cfg: sourceMountConfig) => {
+        const newValue = {
+            ...containerValue, 
+            configureSources: cfg.configure,
+            mountSources: cfg.mount,
+            sourceMapping: cfg.directory
+        };
+        setContainerValue(newValue);
+        
+    }
+
     const resetValidation = (container: Container) => {
         setNameErrorMsg('');
         setInvalid(computeInvalid(container));
@@ -266,10 +306,49 @@ function AddContainerForm({
                     <Section
                         title="Resource Usage"
                         subtitle="CPU and Memory resources necessary for container's execution" />
+                    <Grid item xs={6}>
+                        <TextField
+                            label="Memory Request" fullWidth
+                            placeholder="memory requested for the container. Ex: 1Gi"
+                            value={containerValue.memoryRequest}
+                            onChange={(e) => onMemoryRequestChange(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            label="Memory Limit" fullWidth
+                            placeholder="memory limit for the container. Ex: 1Gi"
+                            value={containerValue.memoryLimit}
+                            onChange={(e) => onMemoryLimitChange(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            label="CPU Request" fullWidth
+                            placeholder="CPU requested for the container. Ex: 500m"
+                            value={containerValue.cpuRequest}
+                            onChange={(e) => onCpuRequestChange(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            label="CPU Limit" fullWidth
+                            placeholder="cpu limit for the container. Ex: 1"
+                            value={containerValue.cpuLimit}
+                            onChange={(e) => onCpuLimitChange(e.target.value)}
+                        />
+                    </Grid>
 
                     <Section
                         title="Sources"
                         subtitle="Declare if and how sources are mounted into the container's filesystem. By default, sources are automatically mounted into $PROJECTS_ROOT or /projects directory" />
+
+                    <Grid item container xs={12} spacing={2}>
+                        <SourceMountConfiguration
+                            value={toSourceMountConfig(containerValue)}
+                            onChange={(cfg: sourceMountConfig) => handleSourceMountConfig(cfg)}
+                        />
+                    </Grid>
 
                     <Section
                         title="Deployment Annotations"
