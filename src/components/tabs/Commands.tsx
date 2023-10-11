@@ -8,7 +8,7 @@ import { ApplyCommand } from '../../model/applyCommand';
 import { ImageCommand } from '../../model/imageCommand';
 import { CompositeCommand } from '../../model/compositeCommand';
 import AddCommand from '../fabs/AddCommand';
-import AddExecCommand from '../forms/AddExecCommand';
+import AddExecCommand, { ExecCommandToCreate } from '../forms/AddExecCommand';
 import AddApplyCommand, { ApplyCommandToCreate } from '../forms/AddApplyCommand';
 import AddImageCommand, { ImageCommandToCreate } from '../forms/AddImageCommand';
 import AddCompositeCommand, { CompositeCommandToCreate } from '../forms/AddCompositeCommand';
@@ -18,8 +18,10 @@ function Commands({
     commands, 
     resourceNames,
     imageNames,
+    containerNames,
     onDefaultChange, 
     onDeleteCommand,
+    onCreateExecCommand,
     onCreateApplyCommand,
     onCreateImageCommand,
     onCreateCompositeCommand
@@ -27,8 +29,10 @@ function Commands({
     commands: Command[]
     resourceNames: string[],
     imageNames: string[],
+    containerNames: string[],
     onDefaultChange: (name: string, group: string, checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
+    onCreateExecCommand: (cmd: ExecCommandToCreate) => Promise<boolean>,
     onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
     onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>,
     onCreateCompositeCommand: (cmd: CompositeCommandToCreate) => Promise<boolean>,
@@ -64,7 +68,16 @@ function Commands({
         });
     }
 
-    return <>
+    
+    const handleCreateExecCommand = (cmd: ExecCommandToCreate) => {
+        onCreateExecCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
+return <>
         {commandToDisplay == '' && <Box sx={{textAlign: "right"}}>
             <AddCommand onAddCommand={handleAddCommand}/>
         </Box>}
@@ -74,7 +87,9 @@ function Commands({
             onDeleteCommand={onDeleteCommand} 
         />}
         {commandToDisplay == 'exec' && <AddExecCommand 
+            containerNames={containerNames}
             onCancel={() => setCommandToDisplay('')}
+            onCreate={ handleCreateExecCommand }
         />}
         {commandToDisplay == 'apply' && <AddApplyCommand 
             resourceNames={resourceNames}

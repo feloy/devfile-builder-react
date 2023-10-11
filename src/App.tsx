@@ -38,7 +38,8 @@ import {
   deleteVolume,
   deleteContainer,
   saveContainer,
-  addContainer
+  addContainer,
+  addExecCommand
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -55,6 +56,7 @@ import Volumes from './components/tabs/Volumes';
 import { Volume } from './model/volume';
 import Containers from './components/tabs/Containers';
 import { Container } from './model/container';
+import { ExecCommandToCreate } from './components/forms/AddExecCommand';
 
 export const App = () => {
 
@@ -156,6 +158,36 @@ export const App = () => {
     }).catch((error: AxiosError) => {
       displayError(error);
     });
+  }
+
+  /**
+   * Create a new Exec command
+   * 
+   * @param cmd the Execcommand to create, and the related container if needed
+   * @returns 
+   */
+  const onCreateExecCommand = (cmd: ExecCommandToCreate): Promise<boolean> => {
+    const doCreateCommand = (): Promise<boolean> => {
+      return addExecCommand(cmd.name, cmd.execCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.containers.length > 0) {
+      const containerToCreate = cmd.containers[0];
+      return addContainer(containerToCreate).then(_ => {
+        return doCreateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doCreateCommand();
+    }
   }
 
   /**
@@ -507,8 +539,10 @@ export const App = () => {
               commands={devfile.commands}
               resourceNames={devfile.resources?.map(r => r.name)}
               imageNames={devfile.images?.map(i => i.name)}
+              containerNames={devfile.containers?.map(i => i.name)}
               onDefaultChange={onDefaultChange}
               onDeleteCommand={onDeleteCommand}
+              onCreateExecCommand={onCreateExecCommand}
               onCreateApplyCommand={onCreateApplyCommand}
               onCreateImageCommand={onCreateImageCommand}
               onCreateCompositeCommand={onCreateCompositeCommand}

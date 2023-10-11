@@ -8,6 +8,7 @@ import { Image } from "../model/image";
 import { CompositeCommand } from "../model/compositeCommand";
 import { Volume } from "../model/volume";
 import { Container } from "../model/container";
+import { ExecCommand } from "../model/execCommand";
 
 const base = "/api/v1/devstate";
 
@@ -79,6 +80,16 @@ export const addApplyCommand = (name: string, cmd: ApplyCommand): Promise<AxiosR
       name: name,
       component: cmd.component,
     });
+}
+
+export const addExecCommand = (name: string, cmd: ExecCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.post<DevfileContent>(base+"/execCommand", {
+    name: name,
+    component: cmd.component,
+    commandLine: cmd.commandLine,
+    workingDir: cmd.workingDir,
+    hotReloadCapable: cmd.hotReloadCapable,
+  });
 }
 
 export const deleteImage = (image: string): Promise<AxiosResponse<DevfileContent, any>> => {
