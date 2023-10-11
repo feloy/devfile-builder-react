@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, List, ListItem, ListItemText } from "@mui/material"
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, List, ListItem, ListItemText, Typography } from "@mui/material"
 import { Image } from "../../model/image"
 import { useState } from "react";
 import AddImage from "../fabs/AddImage";
@@ -126,7 +126,36 @@ function ImageItem({
                 title={image.name}
                 subheader="Image"
             ></CardHeader>
-        <CardContent><pre>{JSON.stringify(image, null, 2)}</pre>
+        <CardContent>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <Typography variant="caption" component="div">Build at Startup</Typography>
+                    {image.autoBuild == 'always' && <div>Yes, forced</div>}
+                    {image.autoBuild == 'undefined' && image.orphan && <div>Yes, the image is not referenced by any command</div>}
+                    {image.autoBuild == 'undefined' && !image.orphan && <div>No, the image is referenced by a command</div>}
+                    {image.autoBuild == 'never' && <div>No, disabled</div>}
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography variant="caption" component="div">Image Name</Typography>
+                    <code>{image.imageName}</code>
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography variant="caption" component="div">Dockerfile URI</Typography>
+                    <code>{image.uri}</code>
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography variant="caption" component="div">Build Context</Typography>
+                    <code>{image.buildContext}</code>
+                </Grid>
+                <Grid item xs={4}>
+                    <Typography variant="caption" component="div">Root Required</Typography>
+                    <code>{image.rootRequired ? 'Yes' : 'No'}</code>
+                </Grid>
+                {
+                    image.args?.length > 0 && <DisplayArgs args={image.args}></DisplayArgs>
+                }
+            </Grid>
+
         </CardContent>
         <CardActions>
             <Button color="error" onClick={() => onDeleteImage(image.name)}>Delete</Button>
@@ -136,4 +165,12 @@ function ImageItem({
     )
 }
 
+function DisplayArgs({args}: {args: string[]}) {
+    return (
+        <Grid item xs={8}>
+            <Typography variant="caption" component="div">Build Args</Typography>
+            {args.map((arg, i) => <div key={`arg-${i}`}>{arg}</div>)}
+        </Grid>
+    )
+}
 export default Images;

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, List, ListItem, ListItemText, Typography } from "@mui/material";
 import { useState } from "react";
 import { Volume } from "../../model/volume";
 import AddVolume from "../fabs/AddVolume";
@@ -122,7 +122,17 @@ function VolumeItem({
                 title={volume.name}
                 subheader="Volume"
             ></CardHeader>
-        <CardContent><pre>{JSON.stringify(volume, null, 2)}</pre>
+        <CardContent>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Volume is Ephemeral</Typography>
+                    <div>{volume.ephemeral ? 'Yes' : 'No'}</div>
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Size</Typography>
+                    <code>{volume.size}</code>
+                </Grid>
+            </Grid>
         </CardContent>
         <CardActions>
             <Button color="error" onClick={() => onDeleteVolume(volume.name)}>Delete</Button>

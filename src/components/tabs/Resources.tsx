@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Grid, List, ListItem, ListItemText, Typography } from "@mui/material";
 import { Resource } from "../../model/resource";
 import AddResource from "../fabs/AddResource";
 import { useState } from "react";
@@ -130,7 +130,28 @@ function ResourceItem({
                 title={resource.name}
                 subheader="Cluster Resource"
             ></CardHeader>
-        <CardContent><pre>{JSON.stringify(resource, null, 2)}</pre>
+        <CardContent>
+            <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <Typography variant="caption" component="div">Deploy at Startup</Typography>
+                    {resource.deployByDefault == 'always' && <div>Yes, forced</div>}
+                    {resource.deployByDefault == 'undefined' && resource.orphan && <div>Yes, the resource is not referenced by any command</div>}
+                    {resource.deployByDefault == 'undefined' && !resource.orphan && <div>No, the resource is referenced by a command</div>}
+                    {resource.deployByDefault == 'never' && <div>No, disabled</div>}
+                </Grid>
+                {
+                    resource.uri && <Grid item xs={12}>
+                        <Typography variant="caption" component="div">URI</Typography>
+                        <code>{resource.uri}</code>
+                    </Grid>
+                }
+                {
+                    resource.inlined && <Grid item xs={12}>
+                        <Typography variant="caption" component="div">Definition</Typography>
+                        <pre style={{marginTop: 0}}>{resource.inlined}</pre>
+                    </Grid>
+                }
+            </Grid>
         </CardContent>
         <CardActions>
             <Button color="error" onClick={() => onDeleteResource(resource.name)}>Delete</Button>

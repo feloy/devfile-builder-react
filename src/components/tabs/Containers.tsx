@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container } from "../../model/container"
 import { Box } from "@mui/system";
 import AddContainer from "../fabs/AddContainer";
-import { Button, Card, CardActions, CardContent, CardHeader, List, ListItem, ListItemText } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, Grid, List, ListItem, ListItemText, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import AddContainerForm from "../forms/AddContainerForm";
 import { Volume } from "../../model/volume";
 
@@ -142,7 +142,87 @@ function ContainerItem({
                 title={container.name}
                 subheader="Container"
             ></CardHeader>
-        <CardContent><pre>{JSON.stringify(container, null, 2)}</pre>
+        <CardContent>
+            <Grid container columnSpacing={2} rowSpacing={3}>
+                <Grid item xs={12}>
+                    <Typography variant="caption" component="div">Image</Typography>
+                    <code>{container.image}</code>
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="caption" component="div">Command / Args</Typography>
+                    <code>{container.command?.join(' ')}{container.args?.join(' ')}</code>
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Environment Variables</Typography>
+                    {container.env?.map((env, i) => <div key={`env-${i}`}><code>{env.name}={env.value}</code></div>)}
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Volume Mounts</Typography>
+                    {container.volumeMounts?.map((vm, i) => <div key={`vm-${i}`}><code>{vm.name} in {vm.path}</code></div>)}
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="caption" component="div">Endpoints</Typography>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Name</TableCell>
+                                <TableCell>Target port</TableCell>
+                                <TableCell>Exposure</TableCell>
+                                <TableCell>Path</TableCell>
+                                <TableCell>Protocol</TableCell>
+                                <TableCell>Secure</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                container.endpoints.map((endpoint, i) => <TableRow key={`endpoint-${i}`}>
+                                    <TableCell>{endpoint.name}</TableCell>
+                                    <TableCell>{endpoint.targetPort}</TableCell>
+                                    <TableCell>{endpoint.exposure}</TableCell>
+                                    <TableCell>{endpoint.path}</TableCell>
+                                    <TableCell>{endpoint.protocol}</TableCell>
+                                    <TableCell>{endpoint.secure ? 'Yes' : 'No'}</TableCell>
+                                </TableRow>)
+                            }
+                        </TableBody>
+                    </Table>
+                </Grid>
+
+                <Grid item xs={3}>
+                    <Typography variant="caption" component="div">Memory Request</Typography>
+                    <code>{container.memoryRequest}</code>
+                </Grid>
+                <Grid item xs={3}>
+                    <Typography variant="caption" component="div">Memory Limit</Typography>
+                    <code>{container.memoryLimit}</code>
+                </Grid>
+                <Grid item xs={3}>
+                    <Typography variant="caption" component="div">CPU Request</Typography>
+                    <code>{container.cpuRequest}</code>
+                </Grid>
+                <Grid item xs={3}>
+                    <Typography variant="caption" component="div">CPU Limit</Typography>
+                    <code>{container.cpuLimit}</code>
+                </Grid>
+                {container.configureSources && <>
+                    <Grid item xs={6}>
+                        <Typography variant="caption" component="div">Mount Sources</Typography>
+                        <code>{container.mountSources ? 'Yes' : 'No'}</code>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Typography variant="caption" component="div">Mount Sources Into</Typography>
+                        <code>{container.sourceMapping}</code>
+                    </Grid>
+                </>}
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Deployment Annotations</Typography>
+                    {container.annotation.deployment && Object.keys(container.annotation.deployment)?.map((anno, i) => <div key={`dep-${i}`}><code>{anno}: {container.annotation.deployment[anno]}</code></div>)}
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography variant="caption" component="div">Service Annotations</Typography>
+                    {container.annotation.service && Object.keys(container.annotation.service)?.map((anno, i) => <div key={`svc-${i}`}><code>{anno}: {container.annotation.service[anno]}</code></div>)}
+                </Grid>
+            </Grid>
         </CardContent>
         <CardActions>
             <Button color="error" onClick={() => onDeleteContainer(container.name)}>Delete</Button>

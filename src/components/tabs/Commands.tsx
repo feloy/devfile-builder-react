@@ -219,19 +219,68 @@ function CommandHeader({name, type, group, isDefault, onDefaultChange}: { name: 
 }
 
 function ExecCommandDetails({command}: {command: ExecCommand}) {
-    return <pre>{ JSON.stringify(command, null, 2) }</pre>
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Typography variant="caption" component="div">Command Line</Typography>
+                <code>{command.commandLine}</code>
+            </Grid>
+
+            <Grid item xs={4}>
+                <Typography variant="caption" component="div">Working Directory</Typography>
+                <code>{command.workingDir}</code>
+            </Grid>
+
+            <Grid item xs={4}>
+                <Typography variant="caption" component="div">Hot Reload Capable</Typography>
+                <code>{command.hotReloadCapable ? 'Yes' : 'No'}</code>
+            </Grid>
+
+            <Grid item xs={4}>
+                <Typography variant="caption" component="div">Container</Typography>
+                <code>{command.component}</code>
+            </Grid>
+        </Grid>
+    )
 }
 
 function ApplyCommandDetails({command}: {command: ApplyCommand}) {
-    return <pre>{ JSON.stringify(command, null, 2) }</pre>
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Typography variant="caption" component="div">Cluster Resource</Typography>
+                <code>{command.component}</code>
+            </Grid>
+
+        </Grid>
+    )
 }
 
 function ImageCommandDetails({command}: {command: ImageCommand}) {
-    return <pre>{ JSON.stringify(command, null, 2) }</pre>
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Typography variant="caption" component="div">Image</Typography>
+                <code>{command.component}</code>
+            </Grid>
+
+        </Grid>
+    )
 }
 
 function CompositeCommandDetails({command}: {command: CompositeCommand}) {
-    return <pre>{ JSON.stringify(command, null, 2) }</pre>
+    return (
+        <Grid container spacing={2}>
+            <Grid item xs={12}>
+                <Typography variant="caption" component="div">Scheduling</Typography>
+                <code>{command.parallel ? 'Commands executed in parallel' : 'Commands executed serially' }</code>
+            </Grid>
+            <Grid item xs={12}>
+                <Typography variant="caption" component="div">Commands</Typography>
+                <code>{command.commands.join(', ')}</code>
+            </Grid>
+        </Grid>
+    )
 }
 
 export default Commands;

@@ -165,7 +165,7 @@ function SingleEndpoint({
                 <InputLabel>Exposure</InputLabel>
                 <Select
                     label="Exposure"
-                    value={value.exposure}
+                    value={value.exposure ?? ''}
                     onChange={(e) => onExposureChange(e.target.value)}
                     onBlur={(e) => onExposureChange(e.target.value)}
                 >
@@ -191,7 +191,7 @@ function SingleEndpoint({
                 <InputLabel>Protocol</InputLabel>
                 <Select
                     label="Protocol"
-                    value={value.protocol}
+                    value={value.protocol ?? ''}
                     onChange={(e) => onProtocolChange(e.target.value)}
                     onBlur={(e) => onProtocolChange(e.target.value)}
                 >
