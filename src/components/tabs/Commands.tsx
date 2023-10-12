@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography, CardActions, Button, Box } from '@mui/material';
+import { List, ListItem, ListSubheader, ListItemText, Card, CardHeader, CardContent,Grid, FormControlLabel, Checkbox, Typography, CardActions, Button, Box, FormControl, Select, InputLabel, MenuItem } from '@mui/material';
 
 import { Command } from '../../model/command';
 import { ExecCommand } from '../../model/execCommand';
@@ -24,7 +24,9 @@ function Commands({
     onCreateExecCommand,
     onCreateApplyCommand,
     onCreateImageCommand,
-    onCreateCompositeCommand
+    onCreateCompositeCommand,
+    onMoveToGroup
+
 }: {
     commands: Command[]
     resourceNames: string[],
@@ -36,6 +38,7 @@ function Commands({
     onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
     onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>,
     onCreateCompositeCommand: (cmd: CompositeCommandToCreate) => Promise<boolean>,
+    onMoveToGroup: (name: string, group: string) => void,
 }) {
     
     const [commandToDisplay, setCommandToDisplay] = useState('');
@@ -77,7 +80,7 @@ function Commands({
         });
     }
 
-return <>
+    return <>
         {commandToDisplay == '' && <Box sx={{textAlign: "right"}}>
             <AddCommand onAddCommand={handleAddCommand}/>
         </Box>}
@@ -85,6 +88,7 @@ return <>
             commands={commands} 
             onDefaultChange={onDefaultChange} 
             onDeleteCommand={onDeleteCommand} 
+            onMoveToGroup={onMoveToGroup}
         />}
         {commandToDisplay == 'exec' && <AddExecCommand 
             containerNames={containerNames}
@@ -112,11 +116,13 @@ return <>
 function CommandsList({
     commands, 
     onDefaultChange, 
-    onDeleteCommand
+    onDeleteCommand,
+    onMoveToGroup,
 }: {
     commands: Command[];
     onDefaultChange: (name: string, group: string, checked: boolean) => void;
     onDeleteCommand: (name: string) => void;
+    onMoveToGroup: (name: string, group: string) => void;
 }) {
     const displayCommands = (group: string) => {
         const list = commands
@@ -132,7 +138,9 @@ function CommandsList({
                             <CommandItem
                                 command={c}
                                 onDefaultChange={(ch) => onDefaultChange(c.name, c.group, ch)}
-                                onDeleteCommand={onDeleteCommand}/>
+                                onDeleteCommand={onDeleteCommand}
+                                onMoveToGroup={onMoveToGroup}    
+                            />
                         </ListItemText>
                     </ListItem>
                 )
@@ -160,11 +168,13 @@ function CommandsList({
 function CommandItem({
     command, 
     onDefaultChange,
-    onDeleteCommand
+    onDeleteCommand,
+    onMoveToGroup,
 }: {
     command: Command, 
     onDefaultChange: (checked: boolean) => void,
-    onDeleteCommand: (name: string) => void
+    onDeleteCommand: (name: string) => void,
+    onMoveToGroup: (name: string, group: string) => void,
 }) {
     return (
         <Card>
@@ -173,7 +183,8 @@ function CommandItem({
                 name={command.name}
                 type={command.type}
                 isDefault={command.default!} 
-                onDefaultChange={onDefaultChange}    
+                onDefaultChange={onDefaultChange}
+                onMoveToGroup={(group: string) => onMoveToGroup(command.name, group)}
             />
             <CardContent>            
                 { command.type == 'exec' && <ExecCommandDetails command={command.exec!} /> }
@@ -188,21 +199,28 @@ function CommandItem({
     )
 }
 
-function CommandHeader({name, type, group, isDefault, onDefaultChange}: { name: string, type: string, group: string, isDefault: boolean,onDefaultChange: (checked: boolean) => void}) {    
+function CommandHeader({
+    name, 
+    type, 
+    group, 
+    isDefault, 
+    onDefaultChange,
+    onMoveToGroup,
+}: { 
+    name: string, 
+    type: string, 
+    group: string, 
+    isDefault: boolean,
+    onDefaultChange: (checked: boolean) => void
+    onMoveToGroup: (group: string) => void
+}) {
     const [defaultChecked, setDefaultChecked] = useState(isDefault);
 
     const onChangeCheckbox = (e: any) => {
         setDefaultChecked(e.target.checked);
         onDefaultChange(e.target.checked);
     }
-    if (group == '') {
-        return (
-            <CardHeader
-                title={name}
-                subheader={`${type} command`}
-            ></CardHeader>
-        )
-    }
+
     return (
         <Grid container spacing={2}>
             <Grid key="header1" item xs={8}>
@@ -212,7 +230,25 @@ function CommandHeader({name, type, group, isDefault, onDefaultChange}: { name: 
                 ></CardHeader>
             </Grid>
             <Grid key="header2" item xs={4}>
-                <CardHeader subheader={<FormControlLabel control={<Checkbox checked={defaultChecked} onChange={onChangeCheckbox}/>} label={`Default ${group} command`} />}></CardHeader>
+                <CardHeader                 
+                    subheader={<>
+                        {group != '' && <FormControlLabel control={<Checkbox checked={defaultChecked} onChange={onChangeCheckbox}/>} label={`Default ${group} command`} />}
+                        <div><FormControl fullWidth variant="standard">
+                                          <InputLabel>Move to Group</InputLabel>
+                                          <Select
+                                            label="Move to Group"
+                                            value=""
+                                            onChange={(e) => onMoveToGroup(e.target.value != '!' ? e.target.value : "")}
+                                          >
+                                            { ["build", "run", "test", "debug", "deploy"].filter(grp => grp != group).map(grp => {
+                                                return <MenuItem key={grp} value={grp}>{grp}</MenuItem>
+                                            })}
+                                            {group != "" && <MenuItem key="generic" value="!">generic</MenuItem>}
+                                          </Select>
+                                        </FormControl></div>
+                    </>}
+                >                    
+                </CardHeader>
             </Grid>
         </Grid>
     )

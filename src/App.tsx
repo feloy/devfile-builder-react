@@ -39,7 +39,8 @@ import {
   deleteContainer,
   saveContainer,
   addContainer,
-  addExecCommand
+  addExecCommand,
+  moveCommand
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -483,6 +484,19 @@ export const App = () => {
     });
   }
 
+  const onMoveToGroup = (commandName: string, newGroup: string) => {
+    const oldGroup = devfile.commands.filter(cmd => cmd.name == commandName)[0].group;
+    const oldIndex = devfile.commands.filter(cmd => cmd.group == oldGroup).findIndex(c => c.name == commandName);
+    const newIndex = devfile.commands.filter(cmd => cmd.group == newGroup).length;
+    return moveCommand(oldGroup, newGroup, oldIndex, newIndex).then((d) => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });  
+}
+
   // UTILITY FUNCTIONS
 
   /**
@@ -546,6 +560,7 @@ export const App = () => {
               onCreateApplyCommand={onCreateApplyCommand}
               onCreateImageCommand={onCreateImageCommand}
               onCreateCompositeCommand={onCreateCompositeCommand}
+              onMoveToGroup={onMoveToGroup}
             />
           </CustomTabPanel>
 

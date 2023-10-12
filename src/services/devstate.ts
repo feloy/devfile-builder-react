@@ -208,3 +208,13 @@ export const saveContainer = (container: Container): Promise<AxiosResponse<any, 
     endpoints: container.endpoints,
   });
 }
+
+export const moveCommand = (previousKind: string, newKind: string, previousIndex: number, newIndex: number): Promise<AxiosResponse<any, any>> => {
+  return axios.post<DevfileContent>(base+"/command/0/move", {
+    fromGroup: previousKind,
+    fromIndex: previousIndex,
+    toGroup: newKind,
+    toIndex: newIndex
+  });
+}
+
