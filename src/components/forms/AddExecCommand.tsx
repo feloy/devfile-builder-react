@@ -5,6 +5,7 @@ import { ExecCommand } from "../../model/execCommand";
 import { Container } from "../../model/container";
 import AddContainerForm from "./AddContainerForm";
 import { emptyContainer } from "../tabs/Containers";
+import { Command } from "../../model/command";
 
 export interface ExecCommandToCreate {
     name: string,
@@ -27,21 +28,25 @@ interface Invalid {
 }
 
 function AddExecCommand({
+    command,
     containerNames,
     volumesNames,
     onCancel,
-    onCreate
+    onCreate,
+    onSave
 }: {
+    command: Command,
     containerNames: string[],
     volumesNames: string[],
     onCancel: () => void,
     onCreate: (cmd: ExecCommandToCreate) => void
-
+    onSave: (cmd: ExecCommandToCreate) => void
 }) {
     const [ commandValue, setCommandValue ] = useState<FormValue>({name: "", commandLine: "", workingDir: "", component: "", hotReloadCapable: false});
     const [ containerNamesList, setContainerNamesList ] = useState(containerNames);
     const [ showNewContainer, setShowNewContainer ] = useState(false);
     const [ newContainertoCreate, setNewContainerToCreate] = useState<Container | undefined>(undefined);
+    const [editing, setEditing] = useState(command.name !== '');
 
     // VALIDATION
     const [invalid, setInvalid] = useState<Invalid>({});
@@ -65,6 +70,17 @@ function AddExecCommand({
     useEffect(() => {
         setInvalid(computeInvalid(commandValue));
     }, [commandValue]);
+
+    useEffect(() => {
+        setCommandValue({
+            name: command.name, 
+            commandLine: command.exec?.commandLine ?? '', 
+            workingDir: command.exec?.workingDir ?? '', 
+            component: command.exec?.component ?? '',
+            hotReloadCapable: command.exec?.hotReloadCapable ?? false
+        });
+        setEditing(command.name != '');
+    }, [command]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
@@ -145,17 +161,25 @@ function AddExecCommand({
         setCommandValue(newValue);
     }
 
-    const handleCreate = () => {
+    const handleClick = () => {
         const {name, ...execCmd} = commandValue;
         const containers: Container[] = [];
         if (newContainertoCreate !== undefined) {
             containers.push(newContainertoCreate);
         }
-        onCreate({
-            name,
-            execCmd,
-            containers
-        });
+        if (editing) {
+            onSave({
+                name,
+                execCmd,
+                containers
+            });
+        } else {
+            onCreate({
+                name,
+                execCmd,
+                containers
+            });
+        }
     }
 
     // New container
@@ -174,7 +198,7 @@ function AddExecCommand({
     return (
         <Card>
             <CardHeader 
-                title="Add an Exec Command"
+                title={editing ? `Edit the Exec command "${command.name}"` : 'Add an Exec Command'}
                 subheader="An Exec command is a shell command executed into a container."
             ></CardHeader>
             <CardContent>
@@ -183,6 +207,7 @@ function AddExecCommand({
                         <TextField
                             label="Name *" fullWidth
                             placeholder="Unique name to identify the command"
+                            disabled={editing}
                             value={commandValue.name}
                             onChange={(e) => onNameChange(e.target.value)}
                             onBlur={(e) => onNameChange(e.target.value)}
@@ -253,7 +278,7 @@ function AddExecCommand({
                 </Grid>
             </CardContent>
             <CardActions>
-                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleCreate}>Create</Button>
+                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleClick}>{editing ? "Save" : "Create" }</Button>
                 <Button onClick={onCancel}>Cancel</Button>
             </CardActions>
         </Card>

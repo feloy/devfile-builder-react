@@ -13,6 +13,11 @@ import AddApplyCommand, { ApplyCommandToCreate } from '../forms/AddApplyCommand'
 import AddImageCommand, { ImageCommandToCreate } from '../forms/AddImageCommand';
 import AddCompositeCommand, { CompositeCommandToCreate } from '../forms/AddCompositeCommand';
 
+const emptyCommand: Command = {
+    name: '',
+    group: '',
+    type: '',
+};
 
 function Commands({
     commands, 
@@ -23,9 +28,13 @@ function Commands({
     onDefaultChange, 
     onDeleteCommand,
     onCreateExecCommand,
+    onSaveExecCommand,
     onCreateApplyCommand,
+    onSaveApplyCommand,
     onCreateImageCommand,
+    onSaveImageCommand,
     onCreateCompositeCommand,
+    onSaveCompositeCommand,
     onMoveToGroup
 
 }: {
@@ -37,13 +46,18 @@ function Commands({
     onDefaultChange: (name: string, group: string, checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
     onCreateExecCommand: (cmd: ExecCommandToCreate) => Promise<boolean>,
+    onSaveExecCommand: (cmd: ExecCommandToCreate) => Promise<boolean>,
     onCreateApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
+    onSaveApplyCommand: (cmd: ApplyCommandToCreate) => Promise<boolean>,
     onCreateImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>,
+    onSaveImageCommand: (cmd: ImageCommandToCreate) => Promise<boolean>,
     onCreateCompositeCommand: (cmd: CompositeCommandToCreate) => Promise<boolean>,
+    onSaveCompositeCommand: (cmd: CompositeCommandToCreate) => Promise<boolean>,
     onMoveToGroup: (name: string, group: string) => void,
 }) {
     
     const [commandToDisplay, setCommandToDisplay] = useState('');
+    const [editedCommand, setEditedCommand] = useState<Command>(emptyCommand);
 
     const handleAddCommand = (commandType: string) =>{
         setCommandToDisplay(commandType);
@@ -51,6 +65,14 @@ function Commands({
 
     const handleCreateApplyCommand = (cmd: ApplyCommandToCreate) => {
         onCreateApplyCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
+    const handleSaveApplyCommand = (cmd: ApplyCommandToCreate) => {
+        onSaveApplyCommand(cmd).then((success: boolean) => {
             if (success) {
                 setCommandToDisplay('');
             }
@@ -65,6 +87,14 @@ function Commands({
         });
     }
 
+    const handleSaveImageCommand = (cmd: ImageCommandToCreate) => {
+        onSaveImageCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
     const handleCreateCompositeCommand = (cmd: CompositeCommandToCreate) =>{
         onCreateCompositeCommand(cmd).then((success: boolean) => {
             if (success) {
@@ -73,6 +103,13 @@ function Commands({
         });
     }
 
+    const handleSaveCompositeCommand = (cmd: CompositeCommandToCreate) =>{
+        onSaveCompositeCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
     
     const handleCreateExecCommand = (cmd: ExecCommandToCreate) => {
         onCreateExecCommand(cmd).then((success: boolean) => {
@@ -80,6 +117,25 @@ function Commands({
                 setCommandToDisplay('');
             }
         });
+    }
+
+    const handleSaveExecCommand = (cmd: ExecCommandToCreate) => {
+        onSaveExecCommand(cmd).then((success: boolean) => {
+            if (success) {
+                setCommandToDisplay('');
+            }
+        });
+    }
+
+    const handleEditCommand = (name: string) => {
+        const command = getCommandByName(name);
+        setCommandToDisplay(command.type);
+        setEditedCommand(command);
+    }
+
+    const getCommandByName = (name: string): Command => {
+        const result = commands.filter(c => c.name == name)[0];
+        return result;
     }
 
     return <>
@@ -90,28 +146,37 @@ function Commands({
             commands={commands} 
             onDefaultChange={onDefaultChange} 
             onDeleteCommand={onDeleteCommand} 
+            onEditCommand={handleEditCommand} 
             onMoveToGroup={onMoveToGroup}
         />}
         {commandToDisplay == 'exec' && <AddExecCommand 
+            command={editedCommand}
             volumesNames={volumesNames}
             containerNames={containerNames}
             onCancel={() => setCommandToDisplay('')}
             onCreate={ handleCreateExecCommand }
+            onSave={ handleSaveExecCommand }
         />}
         {commandToDisplay == 'apply' && <AddApplyCommand 
+            command={editedCommand}
             resourceNames={resourceNames}
             onCancel={() => setCommandToDisplay('')}
             onCreate={ handleCreateApplyCommand }
+            onSave={ handleSaveApplyCommand }
         />}
         {commandToDisplay == 'image' && <AddImageCommand 
+            command={editedCommand}
             imageNames={imageNames}
             onCancel={() => setCommandToDisplay('')}
             onCreate={ handleCreateImageCommand }
+            onSave={ handleSaveImageCommand }
         />}
         {commandToDisplay == 'composite' && <AddCompositeCommand 
+            command={editedCommand}
             commandsNames={commands.map(c => c.name)} 
             onCancel={() => setCommandToDisplay('')}
             onCreate={ handleCreateCompositeCommand }
+            onSave={ handleSaveCompositeCommand }
         />}
     </>
 }
@@ -120,11 +185,13 @@ function CommandsList({
     commands, 
     onDefaultChange, 
     onDeleteCommand,
+    onEditCommand,
     onMoveToGroup,
 }: {
     commands: Command[];
     onDefaultChange: (name: string, group: string, checked: boolean) => void;
     onDeleteCommand: (name: string) => void;
+    onEditCommand: (name: string) => void;
     onMoveToGroup: (name: string, group: string) => void;
 }) {
     const displayCommands = (group: string) => {
@@ -142,6 +209,7 @@ function CommandsList({
                                 command={c}
                                 onDefaultChange={(ch) => onDefaultChange(c.name, c.group, ch)}
                                 onDeleteCommand={onDeleteCommand}
+                                onEditCommand={onEditCommand}
                                 onMoveToGroup={onMoveToGroup}    
                             />
                         </ListItemText>
@@ -172,11 +240,13 @@ function CommandItem({
     command, 
     onDefaultChange,
     onDeleteCommand,
+    onEditCommand,
     onMoveToGroup,
 }: {
     command: Command, 
     onDefaultChange: (checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
+    onEditCommand: (name: string) => void,
     onMoveToGroup: (name: string, group: string) => void,
 }) {
     return (
@@ -197,6 +267,7 @@ function CommandItem({
             </CardContent>
             <CardActions>
                 <Button color="error" onClick={() => onDeleteCommand(command.name)}>Delete</Button>
+                <Button color="primary" onClick={() => onEditCommand(command.name)}>Edit</Button>
             </CardActions>
         </Card>
     )

@@ -5,6 +5,7 @@ import { Image } from "../../model/image";
 import { useEffect, useState } from "react";
 import { commandIdPatternRegex } from "./consts";
 import { emptyImage } from "../tabs/Images";
+import { Command } from "../../model/command";
 
 export interface ImageCommandToCreate {
     name: string,
@@ -23,18 +24,23 @@ interface FormValue {
 }
 
 function AddImageCommand({
+    command,
     imageNames,
     onCancel,
-    onCreate
+    onCreate,
+    onSave
 }: {
+    command: Command,
     imageNames: string[],
     onCancel: () => void,
-    onCreate: (cmd: ImageCommandToCreate) => void
+    onCreate: (cmd: ImageCommandToCreate) => void,
+    onSave: (cmd: ImageCommandToCreate) => void
 }) {
     const [ commandValue, setCommandValue] = useState<FormValue>({name: "", component: ""});
     const [ showNewImage, setShowNewImage ] = useState(false);
     const [ imageNamesList, setImageNamesList ] = useState(imageNames);
     const [ newImagetoCreate, setNewImageToCreate] = useState<Image | undefined>(undefined);
+    const [editing, setEditing] = useState(command.name !== '');
 
     // VALIDATION
     const [invalid, setInvalid] = useState<Invalid>({});
@@ -55,6 +61,11 @@ function AddImageCommand({
     useEffect(() => {
         setInvalid(computeInvalid(commandValue));
     }, [commandValue]);
+
+    useEffect(() => {
+        setCommandValue({name: command.name, component: command.image?.component ?? ''});
+        setEditing(command.name != '');
+    }, [command]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
@@ -91,17 +102,25 @@ function AddImageCommand({
         setCommandValue(newValue);
     }
 
-    const handleCreate = () => {
+    const handleClick = () => {
         const {name, ...imageCmd} = commandValue;
         const images = [];
         if (newImagetoCreate !== undefined) {
             images.push(newImagetoCreate);
         }
-        onCreate({
-            name,
-            imageCmd,
-            images
-        });
+        if (editing) {
+            onSave({
+                name,
+                imageCmd,
+                images
+            });
+        } else {
+            onCreate({
+                name,
+                imageCmd,
+                images
+            });
+        }
     }
 
     // New resource
@@ -120,7 +139,7 @@ function AddImageCommand({
     return (
         <Card>
             <CardHeader
-                title="Add an Image Command"
+                title={editing ? `Edit the Image command "${command.name}"` : 'Add an Image Command'}
                 subheader="An Image command builds a container image and pushes it to a container registry."
             ></CardHeader>
             <CardContent>
@@ -129,6 +148,7 @@ function AddImageCommand({
                         <TextField
                             label="Name *" fullWidth
                             placeholder="Unique name to identify the command"
+                            disabled={editing}
                             value={commandValue.name}
                             onChange={(e) => onNameChange(e.target.value)}
                             onBlur={(e) => onNameChange(e.target.value)}
@@ -165,7 +185,7 @@ function AddImageCommand({
                 </Grid>
             </CardContent>
             <CardActions>
-                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleCreate}>Create</Button>
+                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleClick}>{editing ? "Save" : "Create" }</Button>
                 <Button onClick={onCancel}>Cancel</Button>
             </CardActions>
         </Card>    )

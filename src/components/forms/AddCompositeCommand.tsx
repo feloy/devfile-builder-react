@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { commandIdPatternRegex } from "./consts";
 import { CompositeCommand } from "../../model/compositeCommand";
 import MultiCommandSelect from "../inputs/MultiCommandSelect";
+import { Command } from "../../model/command";
 
 export interface CompositeCommandToCreate {
     name: string,
@@ -21,15 +22,20 @@ interface Invalid {
 }
 
 function AddCompositeCommand({
+    command,
     commandsNames,
     onCancel,
-    onCreate
+    onCreate,
+    onSave
 }: {
+    command: Command,
     commandsNames: string[],
     onCancel: () => void,
-    onCreate: (cmd: CompositeCommandToCreate) => void
+    onCreate: (cmd: CompositeCommandToCreate) => void,
+    onSave: (cmd: CompositeCommandToCreate) => void
 }) {
     const [ commandValue, setCommandValue] = useState<FormValue>({name: "", parallel: false, commands: []});
+    const [editing, setEditing] = useState(command.name !== '');
 
     // VALIDATION
     const [invalid, setInvalid] = useState<Invalid>({});
@@ -50,6 +56,15 @@ function AddCompositeCommand({
     useEffect(() => {
         setInvalid(computeInvalid(commandValue));
     }, [commandValue]);
+    
+    useEffect(() => {
+        setCommandValue({
+            name: command.name, 
+            parallel: command.composite?.parallel ?? false,
+            commands: command.composite?.commands ?? [],
+        });
+        setEditing(command.name != '');
+    }, [command]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
@@ -96,18 +111,25 @@ function AddCompositeCommand({
         updateCommandsErrorMsg(valid);
     }
 
-    const handleCreate = () => {
+    const handleClick = () => {
         const {name, ...compositeCmd} = commandValue;
-        onCreate({
-            name,
-            compositeCmd
-        });
+        if (editing) {
+            onSave({
+                name,
+                compositeCmd
+            });
+        } else {
+            onCreate({
+                name,
+                compositeCmd
+            });
+            }
     }
 
     return (
         <Card>
             <CardHeader 
-                title="Add a Composite Command"
+                title={editing ? `Edit the Composite command "${command.name}"` : 'Add a Composite Command'}
                 subheader="A Composite command executes several commands, either serially or in parallel."></CardHeader>
             <CardContent>
             <Grid container spacing={2}>
@@ -115,6 +137,7 @@ function AddCompositeCommand({
                     <TextField
                         label="Name *" fullWidth
                         placeholder="Unique name to identify the command"
+                        disabled={editing}
                         value={commandValue.name}
                         onChange={(e) => onNameChange(e.target.value)}
                         onBlur={(e) => onNameChange(e.target.value)}
@@ -144,7 +167,7 @@ function AddCompositeCommand({
             </Grid>
             </CardContent>
             <CardActions>
-                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleCreate}>Create</Button>
+                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleClick}>{editing ? "Save" : "Create" }</Button>
                 <Button onClick={onCancel}>Cancel</Button>
             </CardActions>
         </Card>

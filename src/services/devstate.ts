@@ -82,9 +82,24 @@ export const addApplyCommand = (name: string, cmd: ApplyCommand): Promise<AxiosR
     });
 }
 
+export const updateApplyCommand = (name: string, cmd: ApplyCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.patch<DevfileContent>(base+"/applyCommand/"+name, {
+    component: cmd.component,
+  });
+}
+
 export const addExecCommand = (name: string, cmd: ExecCommand): Promise<AxiosResponse<DevfileContent, any>> => {
   return axios.post<DevfileContent>(base+"/execCommand", {
     name: name,
+    component: cmd.component,
+    commandLine: cmd.commandLine,
+    workingDir: cmd.workingDir,
+    hotReloadCapable: cmd.hotReloadCapable,
+  });
+}
+
+export const updateExecCommand = (name: string, cmd: ExecCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.patch<DevfileContent>(base+"/execCommand/"+name, {
     component: cmd.component,
     commandLine: cmd.commandLine,
     workingDir: cmd.workingDir,
@@ -122,6 +137,13 @@ export const saveImage = (image: Image): Promise<AxiosResponse<DevfileContent, a
 export const addCompositeCommand = (name: string, cmd: CompositeCommand): Promise<AxiosResponse<DevfileContent, any>> => {
   return axios.post<DevfileContent>(base+"/compositeCommand", {
     name: name,
+    parallel: cmd.parallel,
+    commands: cmd.commands,
+  });
+}
+
+export const updateCompositeCommand = (name: string, cmd: CompositeCommand): Promise<AxiosResponse<DevfileContent, any>> => {
+  return axios.patch<DevfileContent>(base+"/compositeCommand/"+name, {
     parallel: cmd.parallel,
     commands: cmd.commands,
   });

@@ -5,6 +5,7 @@ import { emptyResource } from "../tabs/Resources";
 import { Resource } from "../../model/resource";
 import { ApplyCommand } from "../../model/applyCommand";
 import { commandIdPatternRegex } from "./consts";
+import { Command } from "../../model/command";
 
 export interface ApplyCommandToCreate {
     name: string,
@@ -23,18 +24,23 @@ interface FormValue {
 }
 
 function AddApplyCommand({
+    command,
     resourceNames,
     onCancel,
-    onCreate
+    onCreate,
+    onSave,
 }: {
+    command: Command,
     resourceNames: string[],
     onCancel: () => void,
     onCreate: (cmd: ApplyCommandToCreate) => void
+    onSave: (cmd: ApplyCommandToCreate) => void
 }) {
     const [ commandValue, setCommandValue] = useState<FormValue>({name: "", component: ""});
     const [ showNewResource, setShowNewResource ] = useState(false);
     const [ resourceNamesList, setResourceNamesList ] = useState(resourceNames);
     const [ newResourcetoCreate, setNewResourceToCreate] = useState<Resource | undefined>(undefined);
+    const [editing, setEditing] = useState(command.name !== '');
 
     // VALIDATION
     const [invalid, setInvalid] = useState<Invalid>({});
@@ -55,6 +61,11 @@ function AddApplyCommand({
     useEffect(() => {
         setInvalid(computeInvalid(commandValue));
     }, [commandValue]);
+
+    useEffect(() => {
+        setCommandValue({name: command.name, component: command.apply?.component ?? ''});
+        setEditing(command.name != '');
+    }, [command]);
 
     // Name validation
     const [nameErrorMsg, setNameErrorMsg] = useState('');
@@ -91,17 +102,25 @@ function AddApplyCommand({
         setCommandValue(newValue);
     }
 
-    const handleCreate = () => {
+    const handleClick = () => {
         const {name, ...applyCmd} = commandValue;
         const resources = [];
         if (newResourcetoCreate !== undefined) {
             resources.push(newResourcetoCreate);
         }
-        onCreate({
-            name,
-            applyCmd,
-            resources
-        });
+        if (editing) {
+            onSave({
+                name,
+                applyCmd,
+                resources
+            });
+        } else {
+            onCreate({
+                name,
+                applyCmd,
+                resources
+            });
+        }
     }
 
     // New resource
@@ -120,7 +139,7 @@ function AddApplyCommand({
     return (
         <Card>
             <CardHeader
-                title="Add an Apply Command"
+                title={editing ? `Edit the Apply command "${command.name}"` : 'Add an Apply Command'}
                 subheader="An Apply command applies a resource to the cluster. Equivalent to kubectl apply -f ..."></CardHeader>
             <CardContent>
                 <Grid container spacing={2}>
@@ -128,6 +147,7 @@ function AddApplyCommand({
                         <TextField
                             label="Name *" fullWidth
                             placeholder="Unique name to identify the command"
+                            disabled={editing}
                             value={commandValue.name}
                             onChange={(e) => onNameChange(e.target.value)}
                             onBlur={(e) => onNameChange(e.target.value)}
@@ -164,7 +184,7 @@ function AddApplyCommand({
                 </Grid>
             </CardContent>
             <CardActions>
-                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleCreate}>Create</Button>
+                <Button disabled={isInvalid()} variant="contained" color="primary" onClick={handleClick}>{editing ? "Save" : "Create" }</Button>
                 <Button onClick={onCancel}>Cancel</Button>
             </CardActions>
         </Card>

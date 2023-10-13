@@ -40,7 +40,10 @@ import {
   saveContainer,
   addContainer,
   addExecCommand,
-  moveCommand
+  moveCommand,
+  updateApplyCommand,
+  updateExecCommand,
+  updateCompositeCommand
 } from './services/devstate';
 
 import { getDevfile as getDevfileFromApi } from './services/api';
@@ -192,6 +195,36 @@ export const App = () => {
   }
 
   /**
+   * Update an Exec command
+   * 
+   * @param cmd the Exec command to update, and the related container if needed
+   * @returns 
+   */
+  const onSaveExecCommand = (cmd: ExecCommandToCreate): Promise<boolean> => {
+    const doUpdateCommand = (): Promise<boolean> => {
+      return updateExecCommand(cmd.name, cmd.execCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.containers.length > 0) {
+      const containerToCreate = cmd.containers[0];
+      return addContainer(containerToCreate).then(_ => {
+        return doUpdateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doUpdateCommand();
+    }
+  }
+
+  /**
    * Create a new Apply Command
    * 
    * @param cmd the Apply command to create, and the related resource if needed
@@ -217,6 +250,35 @@ export const App = () => {
       });
     } else {
       return doCreateCommand();
+    }
+  }
+
+  /**
+   * Update an Apply Command
+   * 
+   * @param cmd the Apply command to update, and the related resource if needed
+   */
+  const onSaveApplyCommand = (cmd: ApplyCommandToCreate): Promise<boolean> => {
+    const doUpdateCommand = (): Promise<boolean> => {
+      return updateApplyCommand(cmd.name, cmd.applyCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.resources.length > 0) {
+      const resourceToCreate = cmd.resources[0];
+      return addResource(resourceToCreate).then(_ => {
+        return doUpdateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doUpdateCommand();
     }
   }
 
@@ -251,12 +313,56 @@ export const App = () => {
   }
 
   /**
+   * Update an Image command
+   * 
+   * @param cmd the Image command to update, and the related image if needed
+   */
+  const onSaveImageCommand = (cmd: ImageCommandToCreate): Promise<boolean> => {
+    const doUpdateCommand = (): Promise<boolean> => {
+      return updateApplyCommand(cmd.name, cmd.imageCmd).then(d => {
+        setDevfile(d.data);
+        return true;
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    }
+
+    if (cmd.images.length > 0) {
+      const imageToCreate = cmd.images[0];
+      return addImage(imageToCreate).then(_ => {
+        return doUpdateCommand();
+      }).catch((error: AxiosError) => {
+        displayError(error);
+        return false;
+      });
+    } else {
+      return doUpdateCommand();
+    }
+  }
+
+  /**
    * Create a new Composite command
    * 
    * @param cmd the Composite command to create
    */
   const onCreateCompositeCommand = (cmd: CompositeCommandToCreate): Promise<boolean> => {
     return addCompositeCommand(cmd.name, cmd.compositeCmd).then(d => {
+      setDevfile(d.data);
+      return true;
+    }).catch((error: AxiosError) => {
+      displayError(error);
+      return false;
+    });
+  }
+
+  /**
+   * Update a new Composite command
+   * 
+   * @param cmd the Composite command to update
+   */
+  const onSaveCompositeCommand = (cmd: CompositeCommandToCreate): Promise<boolean> => {
+    return updateCompositeCommand(cmd.name, cmd.compositeCmd).then(d => {
       setDevfile(d.data);
       return true;
     }).catch((error: AxiosError) => {
@@ -558,9 +664,13 @@ export const App = () => {
               onDefaultChange={onDefaultChange}
               onDeleteCommand={onDeleteCommand}
               onCreateExecCommand={onCreateExecCommand}
+              onSaveExecCommand={onSaveExecCommand}
               onCreateApplyCommand={onCreateApplyCommand}
+              onSaveApplyCommand={onSaveApplyCommand}
               onCreateImageCommand={onCreateImageCommand}
+              onSaveImageCommand={onSaveImageCommand}
               onCreateCompositeCommand={onCreateCompositeCommand}
+              onSaveCompositeCommand={onSaveCompositeCommand}
               onMoveToGroup={onMoveToGroup}
             />
           </CustomTabPanel>

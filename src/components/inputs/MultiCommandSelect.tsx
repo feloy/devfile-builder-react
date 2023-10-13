@@ -1,5 +1,5 @@
 import { Box, Chip, FormControl, FormHelperText, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, Theme, useTheme } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -40,6 +40,10 @@ function MultiCommandSelect({
 }) {
     const theme = useTheme();
     const [values, setValues] = useState<string[]>(value);
+
+    useEffect(() => {
+      setValues(value);
+    }, [value]);
 
     const handleChange = (event: SelectChangeEvent<typeof values>) => {
         const {
