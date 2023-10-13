@@ -19,6 +19,7 @@ function Commands({
     resourceNames,
     imageNames,
     containerNames,
+    volumesNames,
     onDefaultChange, 
     onDeleteCommand,
     onCreateExecCommand,
@@ -32,6 +33,7 @@ function Commands({
     resourceNames: string[],
     imageNames: string[],
     containerNames: string[],
+    volumesNames: string[],
     onDefaultChange: (name: string, group: string, checked: boolean) => void,
     onDeleteCommand: (name: string) => void,
     onCreateExecCommand: (cmd: ExecCommandToCreate) => Promise<boolean>,
@@ -91,6 +93,7 @@ function Commands({
             onMoveToGroup={onMoveToGroup}
         />}
         {commandToDisplay == 'exec' && <AddExecCommand 
+            volumesNames={volumesNames}
             containerNames={containerNames}
             onCancel={() => setCommandToDisplay('')}
             onCreate={ handleCreateExecCommand }

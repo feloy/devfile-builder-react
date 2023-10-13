@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { commandIdPatternRegex } from "./consts";
 import { ExecCommand } from "../../model/execCommand";
 import { Container } from "../../model/container";
+import AddContainerForm from "./AddContainerForm";
+import { emptyContainer } from "../tabs/Containers";
 
 export interface ExecCommandToCreate {
     name: string,
@@ -26,16 +28,20 @@ interface Invalid {
 
 function AddExecCommand({
     containerNames,
+    volumesNames,
     onCancel,
     onCreate
 }: {
     containerNames: string[],
+    volumesNames: string[],
     onCancel: () => void,
     onCreate: (cmd: ExecCommandToCreate) => void
 
 }) {
     const [ commandValue, setCommandValue ] = useState<FormValue>({name: "", commandLine: "", workingDir: "", component: "", hotReloadCapable: false});
     const [ containerNamesList, setContainerNamesList ] = useState(containerNames);
+    const [ showNewContainer, setShowNewContainer ] = useState(false);
+    const [ newContainertoCreate, setNewContainerToCreate] = useState<Container | undefined>(undefined);
 
     // VALIDATION
     const [invalid, setInvalid] = useState<Invalid>({});
@@ -133,6 +139,7 @@ function AddExecCommand({
     const onContainerChange = (v: string) => {
         const valid = isContainerValid(v)
         updateContainerErrorMsg(valid);
+        setShowNewContainer(v == "!");
         const newValue = {...commandValue, component: v};
         setInvalid(computeInvalid(newValue));
         setCommandValue(newValue);
@@ -141,9 +148,9 @@ function AddExecCommand({
     const handleCreate = () => {
         const {name, ...execCmd} = commandValue;
         const containers: Container[] = [];
-        //if (newContainertoCreate !== undefined) {
-        //    images.push(newImagetoCreate);
-        //}
+        if (newContainertoCreate !== undefined) {
+            containers.push(newContainertoCreate);
+        }
         onCreate({
             name,
             execCmd,
@@ -151,6 +158,19 @@ function AddExecCommand({
         });
     }
 
+    // New container
+    const onNewContainerCancel = () => {
+        setShowNewContainer(false);
+        const newValue = {...commandValue, component: ''};
+        setCommandValue(newValue);
+    }
+
+    const onNewContainerCreate = (container: Container) => {        
+        setNewContainerToCreate(container);
+        setContainerNamesList([...containerNamesList, container.name]);
+        onContainerChange(container.name);
+    }
+    
     return (
         <Card>
             <CardHeader 
@@ -221,6 +241,15 @@ function AddExecCommand({
                             onChange={(_, checked: boolean) => onHotreloadChange(checked)}
                         />
                     </Grid>
+                    {showNewContainer && <Grid item xs={12}>
+                        <AddContainerForm
+                            volumesNames={volumesNames}
+                            container={emptyContainer}
+                            onCancel={() => onNewContainerCancel()}
+                            onCreate={onNewContainerCreate}
+                            onSave={() => {}}
+                        />
+                    </Grid>}
                 </Grid>
             </CardContent>
             <CardActions>

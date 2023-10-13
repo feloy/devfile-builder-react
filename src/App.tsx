@@ -554,6 +554,7 @@ export const App = () => {
               resourceNames={devfile.resources?.map(r => r.name)}
               imageNames={devfile.images?.map(i => i.name)}
               containerNames={devfile.containers?.map(i => i.name)}
+              volumesNames={devfile.volumes?.map(i => i.name)}
               onDefaultChange={onDefaultChange}
               onDeleteCommand={onDeleteCommand}
               onCreateExecCommand={onCreateExecCommand}
